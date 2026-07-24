@@ -42,7 +42,7 @@ editable.mode = "redirect"
 # Tell skbuild to where to find CMakeLists.txt.
 cmake.source-dir = "../../"
 cmake.targets = ["cufinufft"]
-cmake.define = {"FINUFF_BUILD_PYTHON" = "ON", "FINUFFT_USE_CUDA" = "OFF",  "FINUFFT_USE_HIP" = "ON", "FINUFFT_USE_CPU" = "OFF", "FINUFFT_ARCH_FLAGS" = ""}
+cmake.define = {"FINUFFT_BUILD_PYTHON" = "ON", "FINUFFT_USE_CUDA" = "ON", "FINUFFT_USE_CPU" = "OFF", "FINUFFT_ARCH_FLAGS" = ""}
 cmake.args = ["-G Ninja"]
 wheel.packages = ["cufinufft"]
 
@@ -69,7 +69,7 @@ sdist.exclude = [".*",
                  "python/cufinufft/tests",
                  "src",
                  "wheelhouse"]
-sdist.include = ["src/hip"]
+sdist.include = ["src/cuda"]
 
 [tool.scikit-build.metadata.version]
 # Instead of hardcoding the version here, extract it from the source files.
@@ -91,10 +91,10 @@ config-settings = {"cmake.define.CMAKE_CUDA_ARCHITECTURES" = "all", "cmake.defin
 # default and numpy/scipy; wheels require glibc >= 2.28.
 manylinux-x86_64-image = "manylinux_2_28"
 manylinux-aarch64-image = "manylinux_2_28"
-repair-wheel-command = ""
+repair-wheel-command = "auditwheel -v repair --exclude libcudart.so.12 --exclude libcufft.so.11 -w {dest_dir} {wheel}"
 
 [tool.cibuildwheel.windows]
 before-build = "pip install delvewheel"
 # CIBW doesn't do vendoring of DLLs on Windows by default, so we have to
 # install delvewheel and run it.
-repair-wheel-command = ""
+repair-wheel-command = "delvewheel repair -v --exclude cudart64_12.dll;cufft64_11.dll --analyze-existing -w {dest_dir} {wheel}"
