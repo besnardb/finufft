@@ -83,7 +83,7 @@ static __forceinline__ __device__ void atomicAddComplexGlobal(cuda_complex<T> *a
 }
 
 template<typename T> auto arrayrange(int n, const T *a, hipStream_t stream) {
-  const auto d_min_max = thrust::minmax_element(thrust::cuda::par.on(stream), a, a + n);
+  const auto d_min_max = thrust::minmax_element(thrust::hip::par.on(stream), a, a + n);
 
   // copy d_min and d_max to host
   T min{}, max{};

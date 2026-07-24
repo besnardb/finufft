@@ -133,15 +133,15 @@ __device__ void eval_kernel_vec_horner(T *ker, const T x, const double upsampfac
 // Given grid sizes (via nf123) and bin sizes, compute the number of bins
 // along every axis.
 template<int ndim>
-inline __host__ __device__ auto get_nbins(cuda::std::array<int, 3> nf123,
-                                          cuda::std::array<int, 3> binsizes) {
-  cuda::std::array<int, 3> nbins{1, 1, 1};
+inline __host__ __device__ auto get_nbins(std::array<int, 3> nf123,
+                                          std::array<int, 3> binsizes) {
+  std::array<int, 3> nbins{1, 1, 1};
   for (int idim = 0; idim < ndim; ++idim)
     nbins[idim] = (nf123[idim] + binsizes[idim] - 1) / binsizes[idim];
   return nbins;
 }
 
-inline __host__ __device__ int nbins_total(const cuda::std::array<int, 3> &nbins) {
+inline __host__ __device__ int nbins_total(const std::array<int, 3> &nbins) {
   return nbins[0] * nbins[1] * nbins[2];
 }
 
@@ -150,11 +150,11 @@ inline __host__ __device__ int nbins_total(const cuda::std::array<int, 3> &nbins
 // Also compute the kernel values to use in spreading/interpolation.
 template<typename T, int KEREVALMETH, int ndim, int ns>
 __device__ auto get_kerval_and_local_start(
-    int idx, cuda::std::array<const T *, 3> xyz, cuda::std::array<int, 3> nf,
-    cuda::std::array<int, ndim> offset, T sigma, T es_c, T es_beta) {
+    int idx, std::array<const T *, 3> xyz, std::array<int, 3> nf,
+    std::array<int, ndim> offset, T sigma, T es_c, T es_beta) {
   constexpr auto ns_2f = T(ns * .5);
-  cuda::std::array<cuda::std::array<T, ns>, ndim> ker;
-  cuda::std::array<int, ndim> start;
+  std::array<std::array<T, ns>, ndim> ker;
+  std::array<int, ndim> start;
   for (int idim = 0; idim < ndim; ++idim) {
     const auto rescaled = fold_rescale(loadReadOnly(xyz[idim] + idx), nf[idim]);
     const auto s        = int(std::ceil(rescaled - ns_2f));
@@ -165,7 +165,7 @@ __device__ auto get_kerval_and_local_start(
     }
     start[idim] = s - offset[idim];
   }
-  return cuda::std::make_tuple(ker, start);
+  return std::make_tuple(ker, start);
 }
 
 // For the current nonuniform point (given via idx), compute the set of
@@ -174,11 +174,11 @@ __device__ auto get_kerval_and_local_start(
 // (Version for nonunifom-points-driven algorithm.)
 template<typename T, int KEREVALMETH, int ndim, int ns>
 __device__ auto get_kerval_and_startpos_nuptsdriven(
-    int idx, cuda::std::array<const T *, 3> xyz, cuda::std::array<int, 3> nf, T sigma,
+    int idx, std::array<const T *, 3> xyz, std::array<int, 3> nf, T sigma,
     T es_c, T es_beta) {
   constexpr auto ns_2f = T(ns * .5);
-  cuda::std::array<cuda::std::array<T, ns>, ndim> ker;
-  cuda::std::array<int, ndim> start;
+  std::array<std::array<T, ns>, ndim> ker;
+  std::array<int, ndim> start;
   for (size_t idim = 0; idim < ndim; ++idim) {
     const auto rescaled = fold_rescale(loadReadOnly(xyz[idim] + idx), nf[idim]);
     const auto s        = int(std::ceil(rescaled - ns_2f));
@@ -189,13 +189,13 @@ __device__ auto get_kerval_and_startpos_nuptsdriven(
     }
     start[idim] = s + ((s < 0) ? nf[idim] : 0);
   }
-  return cuda::std::make_tuple(ker, start);
+  return std::make_tuple(ker, start);
 }
 
 template<int ndim>
-__device__ auto compute_offset(const int bidx, const cuda::std::array<int, 3> &nbins,
-                               const cuda::std::array<int, 3> &binsizes) {
-  cuda::std::array<int, ndim> offset;
+__device__ auto compute_offset(const int bidx, const std::array<int, 3> &nbins,
+                               const std::array<int, 3> &binsizes) {
+  std::array<int, ndim> offset;
   int tmp = bidx;
   for (int idim = 0; idim + 1 < ndim; ++idim) {
     offset[idim] = (tmp % nbins[idim]) * binsizes[idim];
@@ -210,8 +210,8 @@ __device__ auto compute_offset(const int bidx, const cuda::std::array<int, 3> &n
 // of the bin it falls into.
 template<int ndim, typename T>
 __device__ int compute_bin_index(
-    int idx, cuda::std::array<int, 3> nf, cuda::std::array<T, 3> inv_binsizes,
-    cuda::std::array<int, 3> nbins, cuda::std::array<const T *, 3> xyz) {
+    int idx, std::array<int, 3> nf, std::array<T, 3> inv_binsizes,
+    std::array<int, 3> nbins, std::array<const T *, 3> xyz) {
   int binidx = 0;
   int stride = 1;
   for (int idim = 0; idim < ndim; ++idim) {
@@ -227,22 +227,22 @@ __device__ int compute_bin_index(
 
 // Given bin sizes and kernel support, compute the size of a padded subgrid.
 template<int ndim, int ns>
-__device__ auto get_padded_subgrid_info(const cuda::std::array<int, 3> &binsizes) {
+__device__ auto get_padded_subgrid_info(const std::array<int, 3> &binsizes) {
   constexpr auto rounded_ns = ((ns + 1) / 2) * 2;
-  cuda::std::array<int, ndim> padded_size;
+  std::array<int, ndim> padded_size;
   int total = 1;
   for (int idim = 0; idim < ndim; ++idim) {
     padded_size[idim] = binsizes[idim] + rounded_ns;
     total *= padded_size[idim];
   }
-  return cuda::std::make_tuple(padded_size, total);
+  return std::make_tuple(padded_size, total);
 }
 
 // Given a flat index in a local padded subgrid, compute its location in the global grid.
 template<int ndim, int ns>
 __device__ int output_index_from_flat_local_index(
-    int flatidx, const cuda::std::array<int, ndim> &padded_size,
-    const cuda::std::array<int, ndim> &offset, const cuda::std::array<int, 3> &nf) {
+    int flatidx, const std::array<int, ndim> &padded_size,
+    const std::array<int, ndim> &offset, const std::array<int, 3> &nf) {
   constexpr auto ns_2 = (ns + 1) / 2;
 
   int outidx    = 0;
@@ -264,9 +264,9 @@ __device__ int output_index_from_flat_local_index(
 // corresponding local and global pixels, calls the provided function.
 // Useful for copying between global and local grids.
 template<typename T, int ndim, int ns, typename Func>
-__device__ void shared_mem_copy_helper(cuda::std::array<int, 3> binsizes,
-                                       cuda::std::array<int, ndim> offset,
-                                       cuda::std::array<int, 3> nf, Func func) {
+__device__ void shared_mem_copy_helper(std::array<int, 3> binsizes,
+                                       std::array<int, ndim> offset,
+                                       std::array<int, 3> nf, Func func) {
   constexpr auto ns_2 = (ns + 1) / 2;
 
   auto [padded_size, N] = get_padded_subgrid_info<ndim, ns>(binsizes);
@@ -295,9 +295,9 @@ __device__ void shared_mem_copy_helper(cuda::std::array<int, 3> binsizes,
 // FIXME unify the next two functions and templatize on a lambda?
 template<typename T, int ndim>
 __global__ FINUFFT_FLATTEN void calc_bin_size_noghost(
-    const int M, const cuda::std::array<int, 3> nf,
-    const cuda::std::array<T, 3> inv_binsizes, const cuda::std::array<int, 3> nbins,
-    int *FINUFFT_RESTRICT bin_size, const cuda::std::array<const T *, 3> xyz,
+    const int M, const std::array<int, 3> nf,
+    const std::array<T, 3> inv_binsizes, const std::array<int, 3> nbins,
+    int *FINUFFT_RESTRICT bin_size, const std::array<const T *, 3> xyz,
     int *FINUFFT_RESTRICT sortidx) {
   for (int i = threadIdx.x + blockIdx.x * blockDim.x; i < M;
        i += gridDim.x * blockDim.x) {
@@ -309,10 +309,10 @@ __global__ FINUFFT_FLATTEN void calc_bin_size_noghost(
 
 template<typename T, int ndim>
 __global__ FINUFFT_FLATTEN void calc_inverse_of_global_sort_idx(
-    const int M, const cuda::std::array<T, 3> inv_binsizes,
-    const cuda::std::array<int, 3> nbins, const int *FINUFFT_RESTRICT bin_startpts,
-    const int *FINUFFT_RESTRICT sortidx, const cuda::std::array<const T *, 3> xyz,
-    int *FINUFFT_RESTRICT index, const cuda::std::array<int, 3> nf) {
+    const int M, const std::array<T, 3> inv_binsizes,
+    const std::array<int, 3> nbins, const int *FINUFFT_RESTRICT bin_startpts,
+    const int *FINUFFT_RESTRICT sortidx, const std::array<const T *, 3> xyz,
+    int *FINUFFT_RESTRICT index, const std::array<int, 3> nf) {
   for (int i = threadIdx.x + blockIdx.x * blockDim.x; i < M;
        i += gridDim.x * blockDim.x) {
     const int binidx = compute_bin_index<ndim>(i, nf, inv_binsizes, nbins, xyz);
