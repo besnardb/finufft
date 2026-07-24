@@ -4,7 +4,7 @@
 // Prep is shared with gpu_method=2 and instantiated in spread_subprob_inst.cu.
 
 #include "spreadinterp_common.cuh"
-spreadinterp.hpp>/spreadinterp.hpp>
+#include <cufinufft/hip/spreadinterp.hpp>
 #include <poet/poet.hpp>
 
 #ifndef CUFINUFFT_DIM

@@ -4,7 +4,7 @@
 // Compiled three times via CMake foreach with -DCUFINUFFT_DIM={1,2,3}.
 
 #include "spreadinterp_common.cuh"
-spreadinterp.hpp>/spreadinterp.hpp>
+#include <cufinufft/hip/spreadinterp.hpp>
 #include <poet/poet.hpp>
 
 #ifndef CUFINUFFT_DIM
