@@ -176,38 +176,29 @@ private:
   }
 };
 
-class fft_exception final : public finufft::exception {
+class cufft_exception final : public finufft::exception {
 public:
-  fft_exception(fftResult err, const char *op,
-                const char *file = nullptr, int line = 0)
-      : finufft::exception(FINUFFT_ERR_CUDA_FAILURE,
-                           format(err, op, file, line)),
-        fft_code_(err) {}
+  cufft_exception(cufftResult err, const char *op, const char *file = nullptr,
+                  int line = 0)
+      : finufft::exception(FINUFFT_ERR_CUDA_FAILURE, format(err, op, file, line)),
+        cufft_code_(err) {}
 
-  fftResult fft_code() const noexcept {
-    return fft_code_;
-  }
+  cufftResult cufft_code() const noexcept { return cufft_code_; }
 
 private:
-  fftResult fft_code_;
+  cufftResult cufft_code_;
 
-  static std::string format(
-      fftResult e,
-      const char *op,
-      const char *file,
-      int line)
-  {
-      std::string s = op ? op : "<unknown>";
-
-      s += ": ";
-
-      #ifdef CUFINUFFT_USE_HIP
-            s += hipfftGetErrorString(e);
-      #else
-            s += cufftGetErrorString(e);
-      #endif
-
-            return s;
+  static std::string format(cufftResult e, const char *op, const char *file, int line) {
+    std::string s = op ? op : "<unknown>";
+    if (file) {
+      s += " @ ";
+      s += file;
+      s += ":";
+      s += std::to_string(line);
+    }
+    s += ": ";
+    s += cufftGetErrorString(e);
+    return s;
         }
       };
 

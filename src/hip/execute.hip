@@ -147,7 +147,7 @@ void cufinufft_plan_t<T>::execute_type1(hip_complex<T> *d_c, hip_complex<T> *d_f
     // Step 2: FFT
     hipfftResult cufft_status = hipfft_ex(fftplan.get(), fw, fw, iflag);
     if (cufft_status != HIPFFT_SUCCESS)
-      throw cufinufft::fft_exception(cufft_status, "cufft_ex_type1");
+      throw cufinufft::hipfft_exception(cufft_status, "cufft_ex_type1");
 
     // Step 3: deconvolve and shuffle
     deconvolve(fw, fk, blksize);
@@ -196,7 +196,7 @@ void cufinufft_plan_t<T>::execute_type2(hip_complex<T> *d_c, hip_complex<T> *d_f
       THROW_IF_HIP_ERROR();
       hipfftResult cufft_status = hipfft_ex(fftplan.get(), fw, fw, iflag);
       if (cufft_status != HIPFFT_SUCCESS)
-        throw cufinufft::fft_exception(cufft_status, "cufft_ex_type2");
+        throw cufinufft::hipfft_exception(cufft_status, "cufft_ex_type2");
     } else
       fw = fk; // interpolate directly from user input f
 

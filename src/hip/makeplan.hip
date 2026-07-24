@@ -372,7 +372,7 @@ cufinufft_plan_t<T>::cufinufft_plan_t(int type_, int dim_, const int *nmodes, in
                         hipfft_type<T>(), batchsize);
 
       if (hipfft_status != HIPFFT_SUCCESS)
-        throw cufinufft::fft_exception(hipfft_status, "hipfftPlanMany");
+        throw cufinufft::hipfft_exception(hipfft_status, "hipfftPlanMany");
       hipfftSetStream(fftplan.get(), stream);
 
       // compute up to 3 * NQUAD precomputed values on CPU

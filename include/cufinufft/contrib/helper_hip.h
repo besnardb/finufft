@@ -66,6 +66,44 @@ private:
     }
 };
 
+class hipfft_exception final : public finufft::exception {
+public:
+  hipfft_exception(hipfftResult err,
+                   const char *op,
+                   const char *file = nullptr,
+                   int line = 0)
+      : finufft::exception(FINUFFT_ERR_CUDA_FAILURE,
+                           format(err, op, file, line)),
+        hipfft_code_(err) {}
+
+  hipfftResult hipfft_code() const noexcept {
+    return hipfft_code_;
+  }
+
+private:
+  hipfftResult hipfft_code_;
+
+  static std::string format(hipfftResult e,
+                            const char *op,
+                            const char *file,
+                            int line)
+  {
+    std::string s = op ? op : "<unknown>";
+
+    if (file) {
+      s += " @ ";
+      s += file;
+      s += ":";
+      s += std::to_string(line);
+    }
+
+    s += ": ";
+    s += hipfftGetErrorString(e);
+
+    return s;
+  }
+};
+
 namespace detail {
 
 // Sample (and clear) the sticky HIP error flag. Throws if a kernel launch or
