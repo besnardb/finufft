@@ -1,8 +1,13 @@
 // Defines the C++/C user interface to CUFINUFFT library.
 #ifdef CUFINUFFT_USE_HIP
 #include <hipfft/hipfft.h>
+#include <hip/hip_complex.h>
+typedef hipDoubleComplex cufinufftDoubleComplex;
+typedef hipFloatComplex  cufinufftFloatComplex;
 #else
 #include <cufft.h>
+typedef cuDoubleComplex cufinufftDoubleComplex;
+typedef cuFloatComplex  cufinufftFloatComplex;
 #endif
 
 #include <stdint.h>
@@ -33,10 +38,10 @@ FINUFFT_EXPORT int cufinufftf_setpts(
     cufinufftf_plan d_plan, int64_t M, const float *d_x, const float *d_y,
     const float *d_z, int N, const float *d_s, const float *d_t, const float *d_u);
 
-FINUFFT_EXPORT int cufinufft_execute(cufinufft_plan d_plan, cuDoubleComplex *d_c,
-                                     cuDoubleComplex *d_fk);
-FINUFFT_EXPORT int cufinufftf_execute(cufinufftf_plan d_plan, cuFloatComplex *d_c,
-                                      cuFloatComplex *d_fk);
+FINUFFT_EXPORT int cufinufft_execute(cufinufft_plan d_plan, cufinufftDoubleComplex *d_c,
+                                     cufinufftDoubleComplex *d_fk);
+FINUFFT_EXPORT int cufinufftf_execute(cufinufftf_plan d_plan, cufinufftFloatComplex *d_c,
+                                      cufinufftFloatComplex *d_fk);
 
 FINUFFT_EXPORT int cufinufft_destroy(cufinufft_plan d_plan);
 FINUFFT_EXPORT int cufinufftf_destroy(cufinufftf_plan d_plan);
@@ -47,147 +52,147 @@ FINUFFT_EXPORT int cufinufftf_destroy(cufinufftf_plan d_plan);
 
 // Dimension 1111111111111111111111111111111111111111111111111111111111111111
 FINUFFT_EXPORT int cufinufft1d1many(
-    int n_transf, int64_t nj, const double *xj, const cuDoubleComplex *cj, int iflag,
-    double eps, int64_t ms, cuDoubleComplex *fk, const cufinufft_opts *opts);
+    int n_transf, int64_t nj, const double *xj, const cufinufftDoubleComplex *cj, int iflag,
+    double eps, int64_t ms, cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf1d1many(
-    int n_transf, int64_t nj, const float *xj, const cuFloatComplex *cj, int iflag,
-    float eps, int64_t ms, cuFloatComplex *fk, const cufinufft_opts *opts);
-FINUFFT_EXPORT int cufinufft1d1(int64_t nj, const double *xj, const cuDoubleComplex *cj,
-                                int iflag, double eps, int64_t ms, cuDoubleComplex *fk,
+    int n_transf, int64_t nj, const float *xj, const cufinufftFloatComplex *cj, int iflag,
+    float eps, int64_t ms, cufinufftFloatComplex *fk, const cufinufft_opts *opts);
+FINUFFT_EXPORT int cufinufft1d1(int64_t nj, const double *xj, const cufinufftDoubleComplex *cj,
+                                int iflag, double eps, int64_t ms, cufinufftDoubleComplex *fk,
                                 const cufinufft_opts *opts);
-FINUFFT_EXPORT int cufinufftf1d1(int64_t nj, const float *xj, const cuFloatComplex *cj,
-                                 int iflag, float eps, int64_t ms, cuFloatComplex *fk,
+FINUFFT_EXPORT int cufinufftf1d1(int64_t nj, const float *xj, const cufinufftFloatComplex *cj,
+                                 int iflag, float eps, int64_t ms, cufinufftFloatComplex *fk,
                                  const cufinufft_opts *opts);
 
 FINUFFT_EXPORT int cufinufft1d2many(
-    int n_transf, int64_t nj, const double *xj, cuDoubleComplex *cj, int iflag,
-    double eps, int64_t ms, const cuDoubleComplex *fk, const cufinufft_opts *opts);
+    int n_transf, int64_t nj, const double *xj, cufinufftDoubleComplex *cj, int iflag,
+    double eps, int64_t ms, const cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf1d2many(
-    int n_transf, int64_t nj, const float *xj, cuFloatComplex *cj, int iflag, float eps,
-    int64_t ms, const cuFloatComplex *fk, const cufinufft_opts *opts);
-FINUFFT_EXPORT int cufinufft1d2(int64_t nj, const double *xj, cuDoubleComplex *cj,
+    int n_transf, int64_t nj, const float *xj, cufinufftFloatComplex *cj, int iflag, float eps,
+    int64_t ms, const cufinufftFloatComplex *fk, const cufinufft_opts *opts);
+FINUFFT_EXPORT int cufinufft1d2(int64_t nj, const double *xj, cufinufftDoubleComplex *cj,
                                 int iflag, double eps, int64_t ms,
-                                const cuDoubleComplex *fk, const cufinufft_opts *opts);
-FINUFFT_EXPORT int cufinufftf1d2(int64_t nj, const float *xj, cuFloatComplex *cj,
+                                const cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
+FINUFFT_EXPORT int cufinufftf1d2(int64_t nj, const float *xj, cufinufftFloatComplex *cj,
                                  int iflag, float eps, int64_t ms,
-                                 const cuFloatComplex *fk, const cufinufft_opts *opts);
+                                 const cufinufftFloatComplex *fk, const cufinufft_opts *opts);
 
 FINUFFT_EXPORT int cufinufft1d3many(int n_transf, int64_t nj, const double *xj,
-                                    const cuDoubleComplex *cj, int iflag, double eps,
-                                    int64_t nk, const double *s, cuDoubleComplex *fk,
+                                    const cufinufftDoubleComplex *cj, int iflag, double eps,
+                                    int64_t nk, const double *s, cufinufftDoubleComplex *fk,
                                     const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf1d3many(int n_transf, int64_t nj, const float *xj,
-                                     const cuFloatComplex *cj, int iflag, float eps,
-                                     int64_t nk, const float *s, cuFloatComplex *fk,
+                                     const cufinufftFloatComplex *cj, int iflag, float eps,
+                                     int64_t nk, const float *s, cufinufftFloatComplex *fk,
                                      const cufinufft_opts *opts);
-FINUFFT_EXPORT int cufinufft1d3(int64_t nj, const double *xj, const cuDoubleComplex *cj,
+FINUFFT_EXPORT int cufinufft1d3(int64_t nj, const double *xj, const cufinufftDoubleComplex *cj,
                                 int iflag, double eps, int64_t nk, const double *s,
-                                cuDoubleComplex *fk, const cufinufft_opts *opts);
-FINUFFT_EXPORT int cufinufftf1d3(int64_t nj, const float *xj, const cuFloatComplex *cj,
+                                cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
+FINUFFT_EXPORT int cufinufftf1d3(int64_t nj, const float *xj, const cufinufftFloatComplex *cj,
                                  int iflag, float eps, int64_t nk, const float *s,
-                                 cuFloatComplex *fk, const cufinufft_opts *opts);
+                                 cufinufftFloatComplex *fk, const cufinufft_opts *opts);
 
 // Dimension 22222222222222222222222222222222222222222222222222222222222222222
 FINUFFT_EXPORT int cufinufft2d1many(int n_transf, int64_t nj, const double *xj,
-                                    const double *yj, const cuDoubleComplex *cj,
+                                    const double *yj, const cufinufftDoubleComplex *cj,
                                     int iflag, double eps, int64_t ms, int64_t mt,
-                                    cuDoubleComplex *fk, const cufinufft_opts *opts);
+                                    cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf2d1many(int n_transf, int64_t nj, const float *xj,
-                                     const float *yj, const cuFloatComplex *cj, int iflag,
+                                     const float *yj, const cufinufftFloatComplex *cj, int iflag,
                                      float eps, int64_t ms, int64_t mt,
-                                     cuFloatComplex *fk, const cufinufft_opts *opts);
+                                     cufinufftFloatComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufft2d1(
-    int64_t nj, const double *xj, const double *yj, const cuDoubleComplex *cj, int iflag,
-    double eps, int64_t ms, int64_t mt, cuDoubleComplex *fk, const cufinufft_opts *opts);
+    int64_t nj, const double *xj, const double *yj, const cufinufftDoubleComplex *cj, int iflag,
+    double eps, int64_t ms, int64_t mt, cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf2d1(
-    int64_t nj, const float *xj, const float *yj, const cuFloatComplex *cj, int iflag,
-    float eps, int64_t ms, int64_t mt, cuFloatComplex *fk, const cufinufft_opts *opts);
+    int64_t nj, const float *xj, const float *yj, const cufinufftFloatComplex *cj, int iflag,
+    float eps, int64_t ms, int64_t mt, cufinufftFloatComplex *fk, const cufinufft_opts *opts);
 
 FINUFFT_EXPORT int cufinufft2d2many(
-    int n_transf, int64_t nj, const double *xj, const double *yj, cuDoubleComplex *cj,
-    int iflag, double eps, int64_t ms, int64_t mt, const cuDoubleComplex *fk,
+    int n_transf, int64_t nj, const double *xj, const double *yj, cufinufftDoubleComplex *cj,
+    int iflag, double eps, int64_t ms, int64_t mt, const cufinufftDoubleComplex *fk,
     const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf2d2many(
-    int n_transf, int64_t nj, const float *xj, const float *yj, cuFloatComplex *cj,
-    int iflag, float eps, int64_t ms, int64_t mt, const cuFloatComplex *fk,
+    int n_transf, int64_t nj, const float *xj, const float *yj, cufinufftFloatComplex *cj,
+    int iflag, float eps, int64_t ms, int64_t mt, const cufinufftFloatComplex *fk,
     const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufft2d2(int64_t nj, const double *xj, const double *yj,
-                                cuDoubleComplex *cj, int iflag, double eps, int64_t ms,
-                                int64_t mt, const cuDoubleComplex *fk,
+                                cufinufftDoubleComplex *cj, int iflag, double eps, int64_t ms,
+                                int64_t mt, const cufinufftDoubleComplex *fk,
                                 const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf2d2(int64_t nj, const float *xj, const float *yj,
-                                 cuFloatComplex *cj, int iflag, float eps, int64_t ms,
-                                 int64_t mt, const cuFloatComplex *fk,
+                                 cufinufftFloatComplex *cj, int iflag, float eps, int64_t ms,
+                                 int64_t mt, const cufinufftFloatComplex *fk,
                                  const cufinufft_opts *opts);
 
 FINUFFT_EXPORT int cufinufft2d3many(
     int n_transf, int64_t nj, const double *xj, const double *yj,
-    const cuDoubleComplex *cj, int iflag, double eps, int64_t nk, const double *s,
-    const double *t, cuDoubleComplex *fk, const cufinufft_opts *opts);
+    const cufinufftDoubleComplex *cj, int iflag, double eps, int64_t nk, const double *s,
+    const double *t, cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf2d3many(
-    int n_transf, int64_t nj, const float *xj, const float *yj, const cuFloatComplex *cj,
-    int iflag, float eps, int64_t nk, const float *s, const float *t, cuFloatComplex *fk,
+    int n_transf, int64_t nj, const float *xj, const float *yj, const cufinufftFloatComplex *cj,
+    int iflag, float eps, int64_t nk, const float *s, const float *t, cufinufftFloatComplex *fk,
     const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufft2d3(int64_t nj, const double *xj, const double *yj,
-                                const cuDoubleComplex *cj, int iflag, double eps,
+                                const cufinufftDoubleComplex *cj, int iflag, double eps,
                                 int64_t nk, const double *s, const double *t,
-                                cuDoubleComplex *fk, const cufinufft_opts *opts);
+                                cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf2d3(int64_t nj, const float *xj, const float *yj,
-                                 const cuFloatComplex *cj, int iflag, float eps,
+                                 const cufinufftFloatComplex *cj, int iflag, float eps,
                                  int64_t nk, const float *s, const float *t,
-                                 cuFloatComplex *fk, const cufinufft_opts *opts);
+                                 cufinufftFloatComplex *fk, const cufinufft_opts *opts);
 
 // Dimension 3333333333333333333333333333333333333333333333333333333333333333
 FINUFFT_EXPORT int cufinufft3d1many(
     int n_transf, int64_t nj, const double *xj, const double *yj, const double *zj,
-    const cuDoubleComplex *cj, int iflag, double eps, int64_t ms, int64_t mt, int64_t mu,
-    cuDoubleComplex *fk, const cufinufft_opts *opts);
+    const cufinufftDoubleComplex *cj, int iflag, double eps, int64_t ms, int64_t mt, int64_t mu,
+    cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf3d1many(
     int n_transf, int64_t nj, const float *xj, const float *yj, const float *zj,
-    const cuFloatComplex *cj, int iflag, float eps, int64_t ms, int64_t mt, int64_t mu,
-    cuFloatComplex *fk, const cufinufft_opts *opts);
+    const cufinufftFloatComplex *cj, int iflag, float eps, int64_t ms, int64_t mt, int64_t mu,
+    cufinufftFloatComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufft3d1(int64_t nj, const double *xj, const double *yj,
-                                const double *zj, const cuDoubleComplex *cj, int iflag,
+                                const double *zj, const cufinufftDoubleComplex *cj, int iflag,
                                 double eps, int64_t ms, int64_t mt, int64_t mu,
-                                cuDoubleComplex *fk, const cufinufft_opts *opts);
+                                cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf3d1(int64_t nj, const float *xj, const float *yj,
-                                 const float *zj, const cuFloatComplex *cj, int iflag,
+                                 const float *zj, const cufinufftFloatComplex *cj, int iflag,
                                  float eps, int64_t ms, int64_t mt, int64_t mu,
-                                 cuFloatComplex *fk, const cufinufft_opts *opts);
+                                 cufinufftFloatComplex *fk, const cufinufft_opts *opts);
 
 FINUFFT_EXPORT int cufinufft3d2many(
     int n_transf, int64_t nj, const double *xj, const double *yj, const double *zj,
-    cuDoubleComplex *cj, int iflag, double eps, int64_t ms, int64_t mt, int64_t mu,
-    const cuDoubleComplex *fk, const cufinufft_opts *opts);
+    cufinufftDoubleComplex *cj, int iflag, double eps, int64_t ms, int64_t mt, int64_t mu,
+    const cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf3d2many(
     int n_transf, int64_t nj, const float *xj, const float *yj, const float *zj,
-    cuFloatComplex *cj, int iflag, float eps, int64_t ms, int64_t mt, int64_t mu,
-    const cuFloatComplex *fk, const cufinufft_opts *opts);
+    cufinufftFloatComplex *cj, int iflag, float eps, int64_t ms, int64_t mt, int64_t mu,
+    const cufinufftFloatComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufft3d2(int64_t nj, const double *xj, const double *yj,
-                                const double *zj, cuDoubleComplex *cj, int iflag,
+                                const double *zj, cufinufftDoubleComplex *cj, int iflag,
                                 double eps, int64_t ms, int64_t mt, int64_t mu,
-                                const cuDoubleComplex *fk, const cufinufft_opts *opts);
+                                const cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf3d2(int64_t nj, const float *xj, const float *yj,
-                                 const float *zj, cuFloatComplex *cj, int iflag,
+                                 const float *zj, cufinufftFloatComplex *cj, int iflag,
                                  float eps, int64_t ms, int64_t mt, int64_t mu,
-                                 const cuFloatComplex *fk, const cufinufft_opts *opts);
+                                 const cufinufftFloatComplex *fk, const cufinufft_opts *opts);
 
 FINUFFT_EXPORT int cufinufft3d3many(
     int n_transf, int64_t nj, const double *xj, const double *yj, const double *zj,
-    const cuDoubleComplex *cj, int iflag, double eps, int64_t nk, const double *s,
-    const double *t, const double *u, cuDoubleComplex *fk, const cufinufft_opts *opts);
+    const cufinufftDoubleComplex *cj, int iflag, double eps, int64_t nk, const double *s,
+    const double *t, const double *u, cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf3d3many(
     int n_transf, int64_t nj, const float *xj, const float *yj, const float *zj,
-    const cuFloatComplex *cj, int iflag, float eps, int64_t nk, const float *s,
-    const float *t, const float *u, cuFloatComplex *fk, const cufinufft_opts *opts);
+    const cufinufftFloatComplex *cj, int iflag, float eps, int64_t nk, const float *s,
+    const float *t, const float *u, cufinufftFloatComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufft3d3(
     int64_t nj, const double *xj, const double *yj, const double *zj,
-    const cuDoubleComplex *cj, int iflag, double eps, int64_t nk, const double *s,
-    const double *t, const double *u, cuDoubleComplex *fk, const cufinufft_opts *opts);
+    const cufinufftDoubleComplex *cj, int iflag, double eps, int64_t nk, const double *s,
+    const double *t, const double *u, cufinufftDoubleComplex *fk, const cufinufft_opts *opts);
 FINUFFT_EXPORT int cufinufftf3d3(
     int64_t nj, const float *xj, const float *yj, const float *zj,
-    const cuFloatComplex *cj, int iflag, float eps, int64_t nk, const float *s,
-    const float *t, const float *u, cuFloatComplex *fk, const cufinufft_opts *opts);
+    const cufinufftFloatComplex *cj, int iflag, float eps, int64_t nk, const float *s,
+    const float *t, const float *u, cufinufftFloatComplex *fk, const cufinufft_opts *opts);
 #ifdef __cplusplus
 }
 #endif
