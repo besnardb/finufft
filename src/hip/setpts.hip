@@ -85,8 +85,8 @@ void cufinufft_plan_t<T>::setpts(int nj, const T *d_kx, const T *d_ky, const T *
   // it harder to follow. To understand the code, it is recommended to read the CPU code
   // first.
 
-  cuda::std::array<const T *, 3> d_kxyz = {d_kx, d_ky, d_kz};
-  cuda::std::array<const T *, 3> d_stu  = {d_s, d_t, d_u};
+  std::array<const T *, 3> d_kxyz = {d_kx, d_ky, d_kz};
+  std::array<const T *, 3> d_stu  = {d_s, d_t, d_u};
 
   M = nj;
   N = nk;
@@ -220,7 +220,7 @@ void cufinufft_plan_t<T>::setpts(int nj, const T *d_kx, const T *d_ky, const T *
     std::array<T, 3 * MAX_NQUAD> nuft_precomp_f{};
     thrust::device_vector<T> d_nuft_precomp_z(3 * MAX_NQUAD);
     thrust::device_vector<T> d_nuft_precomp_f(3 * MAX_NQUAD);
-    cuda::std::array<gpu_array<T>, 3> phi_hat123(
+    std::array<gpu_array<T>, 3> phi_hat123(
         {gpu_array<T>{0, alloc}, gpu_array<T>{0, alloc}, gpu_array<T>{0, alloc}});
     for (int idim = 0; idim < dim; ++idim) phi_hat123[idim].resize(N);
     for (int idim = 0; idim < dim; ++idim)

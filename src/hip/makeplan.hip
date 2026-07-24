@@ -139,7 +139,7 @@ template std::tuple<CUFINUFFT_BIGINT, double, double>
 cufinufft_plan_t<double>::set_nhg_type3(double, double) const;
 
 template<typename T> void cufinufft_plan_t<T>::allocate_subprob_state() {
-  cuda::std::array<int, 3> binsizes{opts.gpu_binsizex, opts.gpu_binsizey,
+  std::array<int, 3> binsizes{opts.gpu_binsizex, opts.gpu_binsizey,
                                     opts.gpu_binsizez};
 
   switch (opts.gpu_method) {
@@ -167,7 +167,7 @@ template<typename T> void cufinufft_plan_t<T>::allocate_subprob_state() {
       std::cerr << "err: invalid method " << std::endl;
       throw finufft::exception(FINUFFT_ERR_METHOD_NOTVALID);
     }
-    cuda::std::array<int, 3> obinsizes{opts.gpu_obinsizex, opts.gpu_obinsizey,
+    std::array<int, 3> obinsizes{opts.gpu_obinsizex, opts.gpu_obinsizey,
                                        opts.gpu_obinsizez};
     int numobins_tot = 1, numbins_tot = 1;
     for (int idim = 0; idim < dim; ++idim) {

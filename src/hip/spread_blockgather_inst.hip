@@ -11,15 +11,15 @@ namespace spreadinterp {
 // Functions for block-gather spreading
 // Only implemented for 3D at the moment and potentially obsolete.
 
-inline __host__ __device__ int calc_global_index(cuda::std::array<int, 3> idx,
-                                                 cuda::std::array<int, 3> on,
-                                                 cuda::std::array<int, 3> bn) {
-  cuda::std::array<int, 3> oi{idx[0] / bn[0], idx[1] / bn[1], idx[2] / bn[2]};
+inline __host__ __device__ int calc_global_index(std::array<int, 3> idx,
+                                                 std::array<int, 3> on,
+                                                 std::array<int, 3> bn) {
+  std::array<int, 3> oi{idx[0] / bn[0], idx[1] / bn[1], idx[2] / bn[2]};
   return (oi[0] + oi[1] * on[0] + oi[2] * on[1] * on[0]) * (bn[0] * bn[1] * bn[2]) +
          (idx[0] % bn[0] + idx[1] % bn[1] * bn[0] + idx[2] % bn[2] * bn[1] * bn[0]);
 }
 
-inline __global__ void calc_subprob_3d_v1(cuda::std::array<int, 3> binsperobin,
+inline __global__ void calc_subprob_3d_v1(std::array<int, 3> binsperobin,
                                           const int *bin_size, int *num_subprob,
                                           int maxsubprobsize, int numbins) {
   for (int i = threadIdx.x + blockIdx.x * blockDim.x; i < numbins;
@@ -43,20 +43,20 @@ inline __global__ void map_b_into_subprob_3d_v1(int *d_subprob_to_obin,
       d_subprob_to_obin[d_subprobstartpts[i] + j] = i;
 }
 
-inline __global__ void fill_ghost_bins(cuda::std::array<int, 3> binsperobin,
-                                       cuda::std::array<int, 3> nobin, int *binsize) {
+inline __global__ void fill_ghost_bins(std::array<int, 3> binsperobin,
+                                       std::array<int, 3> nobin, int *binsize) {
   constexpr int ndim = 3;
 
-  cuda::std::array<int, 3> bin = {int(threadIdx.x + blockIdx.x * blockDim.x),
+  std::array<int, 3> bin = {int(threadIdx.x + blockIdx.x * blockDim.x),
                                   int(threadIdx.y + blockIdx.y * blockDim.y),
                                   int(threadIdx.z + blockIdx.z * blockDim.z)};
 
-  cuda::std::array<int, 3> nbin;
+  std::array<int, 3> nbin;
   for (int idim = 0; idim < ndim; ++idim) nbin[idim] = nobin[idim] * binsperobin[idim];
 
   if (bin[0] < nbin[0] && bin[1] < nbin[1] && bin[2] < nbin[2]) {
     int binidx = calc_global_index(bin, nobin, binsperobin);
-    cuda::std::array<int, 3> ijk;
+    std::array<int, 3> ijk;
     for (int idim = 0; idim < ndim; ++idim) {
       ijk[idim] = bin[idim];
       if (bin[idim] % binsperobin[idim] == 0) {
@@ -76,22 +76,22 @@ inline __global__ void fill_ghost_bins(cuda::std::array<int, 3> binsperobin,
 }
 
 inline __global__ void ghost_bin_pts_index(
-    cuda::std::array<int, 3> binsperobin, cuda::std::array<int, 3> nobin,
+    std::array<int, 3> binsperobin, std::array<int, 3> nobin,
     const int *binsize, int *index, const int *binstartpts, int M) {
   constexpr int ndim = 3;
 
-  cuda::std::array<int, 3> bin = {int(threadIdx.x + blockIdx.x * blockDim.x),
+  std::array<int, 3> bin = {int(threadIdx.x + blockIdx.x * blockDim.x),
                                   int(threadIdx.y + blockIdx.y * blockDim.y),
                                   int(threadIdx.z + blockIdx.z * blockDim.z)};
 
-  cuda::std::array<int, 3> nbin;
+  std::array<int, 3> nbin;
   for (int idim = 0; idim < ndim; ++idim) nbin[idim] = nobin[idim] * binsperobin[idim];
 
   bool w = false;
-  cuda::std::array<int, 3> box;
+  std::array<int, 3> box;
   if (bin[0] < nbin[0] && bin[1] < nbin[1] && bin[2] < nbin[2]) {
     int binidx = calc_global_index(bin, nobin, binsperobin);
-    cuda::std::array<int, 3> ijk;
+    std::array<int, 3> ijk;
     for (int idim = 0; idim < ndim; ++idim) {
       box[idim] = 0;
       ijk[idim] = bin[idim];
@@ -120,12 +120,12 @@ inline __global__ void ghost_bin_pts_index(
 
 template<typename T>
 __global__ void locate_nupts_to_bins_ghost(
-    int M, cuda::std::array<int, 3> binsize, cuda::std::array<int, 3> nobin,
-    cuda::std::array<int, 3> binsperobin, int *bin_size,
-    cuda::std::array<const T *, 3> xyz, int *sortidx, cuda::std::array<int, 3> nf123) {
+    int M, std::array<int, 3> binsize, std::array<int, 3> nobin,
+    std::array<int, 3> binsperobin, int *bin_size,
+    std::array<const T *, 3> xyz, int *sortidx, std::array<int, 3> nf123) {
   int binidx;
   constexpr int ndim = 3;
-  cuda::std::array<int, 3> bin;
+  std::array<int, 3> bin;
   int oldidx;
   for (int i = threadIdx.x + blockIdx.x * blockDim.x; i < M;
        i += gridDim.x * blockDim.x) {
@@ -145,11 +145,11 @@ __global__ void locate_nupts_to_bins_ghost(
 
 template<typename T>
 __global__ void calc_inverse_of_global_sort_index_ghost(
-    int M, cuda::std::array<int, 3> binsize, cuda::std::array<int, 3> nobin,
-    cuda::std::array<int, 3> binsperobin, const int *bin_startpts, const int *sortidx,
-    cuda::std::array<const T *, 3> xyz, int *index, cuda::std::array<int, 3> nf123) {
+    int M, std::array<int, 3> binsize, std::array<int, 3> nobin,
+    std::array<int, 3> binsperobin, const int *bin_startpts, const int *sortidx,
+    std::array<const T *, 3> xyz, int *index, std::array<int, 3> nf123) {
   constexpr int ndim = 3;
-  cuda::std::array<int, 3> bin;
+  std::array<int, 3> bin;
   for (int i = threadIdx.x + blockIdx.x * blockDim.x; i < M;
        i += gridDim.x * blockDim.x) {
 
@@ -176,15 +176,15 @@ __global__ void spread_3d_block_gather(cufinufft_gpu_data<T> p, const cuda_compl
   T sigma            = p.sigma;
   int maxsubprobsize = p.opts.gpu_maxsubprobsize;
 
-  cuda::std::array<int, 3> obin_size{p.opts.gpu_obinsizex, p.opts.gpu_obinsizey,
+  std::array<int, 3> obin_size{p.opts.gpu_obinsizex, p.opts.gpu_obinsizey,
                                      p.opts.gpu_obinsizez};
-  cuda::std::array<int, 3> bin_size{p.opts.gpu_binsizex, p.opts.gpu_binsizey,
+  std::array<int, 3> bin_size{p.opts.gpu_binsizex, p.opts.gpu_binsizey,
                                     p.opts.gpu_binsizez};
-  cuda::std::array<int, ndim> nobin;
+  std::array<int, ndim> nobin;
   for (size_t idim = 0; idim < ndim; ++idim)
     nobin[idim] = ceil((T)p.nf123[idim] / obin_size[idim]);
 
-  cuda::std::array<int, ndim> binsperobin;
+  std::array<int, ndim> binsperobin;
   int binsperobin_tot = 1;
   for (size_t idim = 0; idim < ndim; ++idim) {
     binsperobin[idim] = obin_size[idim] / bin_size[idim] + 2;
@@ -207,7 +207,7 @@ __global__ void spread_3d_block_gather(cufinufft_gpu_data<T> p, const cuda_compl
 
   const int N = obin_size[0] * obin_size[1] * obin_size[2];
 
-  cuda::std::array<cuda::std::array<T, ns>, 3> ker;
+  std::array<std::array<T, ns>, 3> ker;
 
   for (int i = threadIdx.x; i < N; i += blockDim.x) fwshared[i] = {0, 0};
 
@@ -224,7 +224,7 @@ __global__ void spread_3d_block_gather(cufinufft_gpu_data<T> p, const cuda_compl
       b = b / 3;
     }
     const int ii = nidx % p.M;
-    cuda::std::array<int, 3> start, startnew, endnew;
+    std::array<int, 3> start, startnew, endnew;
     for (int idim = 0; idim < ndim; ++idim) {
       const auto rescaled =
           fold_rescale(p.xyz[idim][ii], p.nf123[idim]) + box[idim] * p.nf123[idim];
@@ -327,7 +327,7 @@ template<typename T> void do_indexSort_blockgather_3d(cufinufft_plan_t<T> &p) {
   int M              = p.M;
 
   int maxsubprobsize                  = p.opts.gpu_maxsubprobsize;
-  cuda::std::array<int, 3> o_bin_size = {p.opts.gpu_obinsizex, p.opts.gpu_obinsizey,
+  std::array<int, 3> o_bin_size = {p.opts.gpu_obinsizex, p.opts.gpu_obinsizey,
                                          p.opts.gpu_obinsizez};
 
   if (p.nf123[0] % o_bin_size[0] != 0 || p.nf123[1] % o_bin_size[1] != 0 ||
@@ -341,11 +341,11 @@ template<typename T> void do_indexSort_blockgather_3d(cufinufft_plan_t<T> &p) {
     throw finufft::exception(FINUFFT_ERR_BINSIZE_NOTVALID);
   }
 
-  cuda::std::array<int, 3> numobins;
+  std::array<int, 3> numobins;
   for (int idim = 0; idim < ndim; ++idim)
     numobins[idim] = ceil((T)p.nf123[idim] / o_bin_size[idim]);
 
-  cuda::std::array<int, 3> bin_size = {p.opts.gpu_binsizex, p.opts.gpu_binsizey,
+  std::array<int, 3> bin_size = {p.opts.gpu_binsizex, p.opts.gpu_binsizey,
                                        p.opts.gpu_binsizez};
   if (o_bin_size[0] % bin_size[0] != 0 || o_bin_size[1] % bin_size[1] != 0 ||
       o_bin_size[2] % bin_size[2] != 0) {
@@ -359,8 +359,8 @@ template<typename T> void do_indexSort_blockgather_3d(cufinufft_plan_t<T> &p) {
     throw finufft::exception(FINUFFT_ERR_BINSIZE_NOTVALID);
   }
 
-  cuda::std::array<int, 3> binsperobin;
-  cuda::std::array<int, 3> numbins;
+  std::array<int, 3> binsperobin;
+  std::array<int, 3> numbins;
   for (int idim = 0; idim < ndim; ++idim) {
     binsperobin[idim] = o_bin_size[idim] / bin_size[idim] + 2;
     numbins[idim]     = numobins[idim] * binsperobin[idim];

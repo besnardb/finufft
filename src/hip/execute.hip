@@ -24,16 +24,16 @@
 // to -1).
 template<typename T, int modeord, int ndim>
 static __global__ void deconv_nd(
-    cuda::std::array<int, 3> mstu, cuda::std::array<int, 3> nf123, cuda_complex<T> *fw,
-    cuda_complex<T> *fk, cuda::std::array<const T *, 3> fwkerhalf, bool fw2fk) {
+    std::array<int, 3> mstu, std::array<int, 3> nf123, cuda_complex<T> *fw,
+    cuda_complex<T> *fk, std::array<const T *, 3> fwkerhalf, bool fw2fk) {
 
-  cuda::std::array<int, 3> m_acc{1, mstu[0], mstu[0] * mstu[1]};
+  std::array<int, 3> m_acc{1, mstu[0], mstu[0] * mstu[1]};
   int mtotal = m_acc[ndim - 1] * mstu[ndim - 1];
-  cuda::std::array<int, 3> nf_acc{1, nf123[0], nf123[0] * nf123[1]};
+  std::array<int, 3> nf_acc{1, nf123[0], nf123[0] * nf123[1]};
 
   for (int i = blockDim.x * blockIdx.x + threadIdx.x; i < mtotal;
        i += blockDim.x * gridDim.x) {
-    cuda::std::array<int, 3> k;
+    std::array<int, 3> k;
     if constexpr (ndim == 1) k = {i, 0, 0};
     if constexpr (ndim == 2) k = {i % mstu[0], i / mstu[0], 0};
     if constexpr (ndim == 3)
