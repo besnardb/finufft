@@ -6,7 +6,7 @@
 #include "spreadinterp_common.cuh"
 #include <cufinufft/hip/spreadinterp.hpp>
 #include <poet/poet.hpp>
-
+#define CUFINUFFT_DIM 1
 #ifndef CUFINUFFT_DIM
 #error "CUFINUFFT_DIM must be defined to 1, 2, or 3 (set by CMake)"
 #endif
@@ -116,8 +116,6 @@ void spread_output_driven_launch(const cufinufft_plan_t<T> &d_plan,
   const int nthreads           = std::min(256, std::max(bufsz, d_plan.opts.gpu_np));
 
   const auto launch = [&](auto kernel) {
-    hipSetSharedMemoryConfig(kernel, d_plan);
-    hipFuncSetSharedMemConfig(kernel, hipSharedMemBankSizeEightByte);
     THROW_IF_HIP_ERROR();
     for (int t = 0; t < blksize; t++) {
       kernel<<<d_plan.totalnumsubprob, std::min(256, std::max(bufsz, d_plan.opts.gpu_np)),

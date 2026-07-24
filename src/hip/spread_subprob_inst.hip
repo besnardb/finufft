@@ -104,7 +104,6 @@ void spread_subprob_launch(const cufinufft_plan_t<T> &d_plan, const cuda_complex
   const auto sharedplanorysize = d_plan.shared_memory_required();
 
   const auto launch = [&](auto kernel) {
-    hipSetSharedMemoryConfig(kernel, d_plan);
     for (int t = 0; t < blksize; t++) {
       kernel<<<d_plan.totalnumsubprob, 256, sharedplanorysize, d_plan.stream>>>(
           d_plan, c + t * d_plan.M, fw + t * d_plan.nf);
