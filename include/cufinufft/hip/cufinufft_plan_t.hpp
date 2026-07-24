@@ -1,7 +1,7 @@
 #ifndef CUFINUFFT_PLAN_T_H
 #define CUFINUFFT_PLAN_T_H
 
-#include <cuda/std/array>
+#include <array>
 #include <hipfft/hipfft.h>
 #include <cufinufft/contrib/helper_cuda.h>
 #include <cufinufft/hip/types.hpp>
@@ -188,15 +188,15 @@ template<typename T> inline const T *dethrust(const gpu_array<T> &arr) {
   return thrust::raw_pointer_cast(arr.data());
 }
 template<typename T>
-inline cuda::std::array<T *, 3> dethrust(cuda::std::array<gpu_array<T>, 3> &arr) {
-  cuda::std::array<T *, 3> res;
+inline std::array<T *, 3> dethrust(std::array<gpu_array<T>, 3> &arr) {
+  std::array<T *, 3> res;
   for (int i = 0; i < 3; ++i) res[i] = dethrust(arr[i]);
   return res;
 }
 template<typename T>
-inline cuda::std::array<const T *, 3> dethrust(
-    const cuda::std::array<gpu_array<T>, 3> &arr) {
-  cuda::std::array<const T *, 3> res;
+inline std::array<const T *, 3> dethrust(
+    const std::array<gpu_array<T>, 3> &arr) {
+  std::array<const T *, 3> res;
   for (int i = 0; i < 3; ++i) res[i] = dethrust(arr[i]);
   return res;
 }
@@ -303,29 +303,29 @@ private:
   const T tol;
 
   CUFINUFFT_BIGINT M                          = 0;
-  cuda::std::array<CUFINUFFT_BIGINT, 3> nf123 = {0, 0, 0};
-  cuda::std::array<CUFINUFFT_BIGINT, 3> mstu  = {0, 0, 0};
+  std::array<CUFINUFFT_BIGINT, 3> nf123 = {0, 0, 0};
+  std::array<CUFINUFFT_BIGINT, 3> mstu  = {0, 0, 0};
   int batchsize                               = 0;
 
   int totalnumsubprob                         = 0;
-  cuda::std::array<gpu_array<T>, 3> fwkerhalf = {
+  std::array<gpu_array<T>, 3> fwkerhalf = {
       gpu_array<T>{0, alloc}, gpu_array<T>{0, alloc}, gpu_array<T>{0, alloc}};
 
   // for type 1,2 it is a pointer to kx, ky, kz (no new allocs), for type 3 it
   // for t3: allocated as "primed" (scaled) src pts x'_j, etc
-  cuda::std::array<const T *, 3> kxyz     = {nullptr, nullptr, nullptr};
-  cuda::std::array<gpu_array<T>, 3> kxyzp = {
+  std::array<const T *, 3> kxyz     = {nullptr, nullptr, nullptr};
+  std::array<gpu_array<T>, 3> kxyzp = {
       gpu_array<T>{0, alloc}, gpu_array<T>{0, alloc}, gpu_array<T>{0, alloc}};
 
   // Type 3 specific
   struct {
-    cuda::std::array<T, 3> X = {0, 0, 0}, C = {0, 0, 0}, S = {0, 0, 0}, D = {0, 0, 0},
+    std::array<T, 3> X = {0, 0, 0}, C = {0, 0, 0}, S = {0, 0, 0}, D = {0, 0, 0},
                            h = {0, 0, 0}, gam = {0, 0, 0};
   } type3_params;
   int N                                  = 0; // number of NU freq pts (type 3 only)
   CUFINUFFT_BIGINT nf                    = 0;
-  cuda::std::array<const T *, 3> STU     = {nullptr, nullptr, nullptr};
-  cuda::std::array<gpu_array<T>, 3> STUp = {
+  std::array<const T *, 3> STU     = {nullptr, nullptr, nullptr};
+  std::array<gpu_array<T>, 3> STUp = {
       gpu_array<T>{0, alloc}, gpu_array<T>{0, alloc}, gpu_array<T>{0, alloc}};
   // inner type 2 plan for type 3
   std::unique_ptr<cufinufft_plan_t<T>> t2_plan;
@@ -519,8 +519,8 @@ template<typename T> struct cufinufft_gpu_data {
   int type                                    = 0;
   int dim                                     = 0;
   CUFINUFFT_BIGINT M                          = 0;
-  cuda::std::array<CUFINUFFT_BIGINT, 3> nf123 = {0, 0, 0};
-  cuda::std::array<CUFINUFFT_BIGINT, 3> mstu  = {0, 0, 0};
+  std::array<CUFINUFFT_BIGINT, 3> nf123 = {0, 0, 0};
+  std::array<CUFINUFFT_BIGINT, 3> mstu  = {0, 0, 0};
   int ntransf                                 = 0;
   int batchsize                               = 0;
   int iflag                                   = 0;
@@ -529,11 +529,11 @@ template<typename T> struct cufinufft_gpu_data {
 
   // for type 1,2 it is a pointer to kx, ky, kz (no new allocs), for type 3 it
   // for t3: allocated as "primed" (scaled) src pts x'_j, etc
-  cuda::std::array<const T *, 3> xyz = {nullptr, nullptr, nullptr};
+  std::array<const T *, 3> xyz = {nullptr, nullptr, nullptr};
 
   int N                              = 0; // number of NU freq pts (type 3 only)
   CUFINUFFT_BIGINT nf                = 0;
-  cuda::std::array<const T *, 3> STU = {nullptr, nullptr, nullptr};
+  std::array<const T *, 3> STU = {nullptr, nullptr, nullptr};
   T tol                              = 0;
 
   const cuda_complex<T> *prephase = nullptr; // pre-phase, for all input NU pts
