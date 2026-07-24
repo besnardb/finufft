@@ -137,9 +137,9 @@ auto launch_dispatch_ndim_ns(Func &&func, int target_ndim, int target_ns,
  *   SM 6x-     :  4 warps  = 64 threads
  */
 inline unsigned optimal_block_threads(int device) noexcept {
-  hipGetDevice(&device);
+  checkHipErrors(hipGetDevice(&device));
   hipDeviceProp_t prop;
-  hipGetDeviceProperties(&prop, device);
+  checkHipErrors(hipGetDeviceProperties(&prop, device));
   int major = prop.major;
   if (major >= 8) return 256;
   if (major >= 7) return 128;
