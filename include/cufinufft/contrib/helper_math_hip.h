@@ -197,7 +197,8 @@ __device__ inline hip_complex<T> complex_add(
     hip_complex<T> b);
 
 
-__device__ inline hipFloatComplex complex_add(
+template<>
+__device__ inline hipFloatComplex complex_add<float>(
     hipFloatComplex a,
     hipFloatComplex b)
 {
@@ -205,7 +206,8 @@ __device__ inline hipFloatComplex complex_add(
 }
 
 
-__device__ inline hipDoubleComplex complex_add(
+template<>
+__device__ inline hipDoubleComplex complex_add<double>(
     hipDoubleComplex a,
     hipDoubleComplex b)
 {
