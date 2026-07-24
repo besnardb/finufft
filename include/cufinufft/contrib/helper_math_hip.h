@@ -197,21 +197,19 @@ __device__ inline hip_complex<T> complex_add(
     hip_complex<T> b);
 
 
-template<>
 __device__ inline hipFloatComplex complex_add(
     hipFloatComplex a,
     hipFloatComplex b)
 {
-    return hipCaddf(a,b);
+    return hipCaddf(a, b);
 }
 
 
-template<>
 __device__ inline hipDoubleComplex complex_add(
     hipDoubleComplex a,
     hipDoubleComplex b)
 {
-    return hipCadd(a,b);
+    return hipCadd(a, b);
 }
 
 /* Auxiliary func to compute power of complex number */
