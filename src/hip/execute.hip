@@ -193,7 +193,7 @@ void cufinufft_plan_t<T>::execute_type2(cuda_complex<T> *d_c, cuda_complex<T> *d
       deconvolve(fw, fk, blksize);
 
       // Step 2: FFT
-      THROW_IF_CUDA_ERROR();
+      THROW_IF_HIP_ERROR();
       hipfftResult cufft_status = cufft_ex(fftplan.get(), fw, fw, iflag);
       if (cufft_status != HIPFFT_SUCCESS)
         throw cufinufft::cufft_exception(cufft_status, "cufft_ex_type2");

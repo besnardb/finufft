@@ -324,7 +324,7 @@ cufinufft_plan_t<T>::cufinufft_plan_t(int type_, int dim_, const int *nmodes, in
         throw finufft::exception(FINUFFT_ERR_INSUFFICIENT_SHMEM);
       }
     }
-    THROW_IF_CUDA_ERROR();
+    THROW_IF_HIP_ERROR();
   }
   // Bin size and memory info now printed in cufinufft_setup_binsize() (common.cu)
   // Additional runtime info at debug level 2
