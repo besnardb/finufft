@@ -145,9 +145,9 @@ void cufinufft_plan_t<T>::execute_type1(hip_complex<T> *d_c, hip_complex<T> *d_f
     if (opts.gpu_spreadinterponly) continue; // skip steps 2 and 3
 
     // Step 2: FFT
-    hipfftResult cufft_status = cufft_ex(fftplan.get(), fw, fw, iflag);
+    hipfftResult cufft_status = hipfft_ex(fftplan.get(), fw, fw, iflag);
     if (cufft_status != HIPFFT_SUCCESS)
-      throw cufinufft::cufft_exception(cufft_status, "cufft_ex_type1");
+      throw cufinufft::fft_exception(cufft_status, "cufft_ex_type1");
 
     // Step 3: deconvolve and shuffle
     deconvolve(fw, fk, blksize);
@@ -194,9 +194,9 @@ void cufinufft_plan_t<T>::execute_type2(hip_complex<T> *d_c, hip_complex<T> *d_f
 
       // Step 2: FFT
       THROW_IF_HIP_ERROR();
-      hipfftResult cufft_status = cufft_ex(fftplan.get(), fw, fw, iflag);
+      hipfftResult cufft_status = hipfft_ex(fftplan.get(), fw, fw, iflag);
       if (cufft_status != HIPFFT_SUCCESS)
-        throw cufinufft::cufft_exception(cufft_status, "cufft_ex_type2");
+        throw cufinufft::fft_exception(cufft_status, "cufft_ex_type2");
     } else
       fw = fk; // interpolate directly from user input f
 
