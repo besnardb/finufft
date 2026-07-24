@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include <cufinufft/contrib/helper_hip.h>
-#include <cufinufft/contrib/helper_math.h>
+#include <cufinufft/contrib/helper_math_hip.h>
 
 #include <cufinufft.h>
 #include <cufinufft/hip/fft.hpp>

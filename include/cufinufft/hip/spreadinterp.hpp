@@ -6,7 +6,7 @@
 #include <thrust/sequence.h>
 
 #include <cufinufft/contrib/helper_hip.h>
-#include <cufinufft/contrib/helper_math.h>
+#include <cufinufft/contrib/helper_math_hip.h>
 #include <cufinufft/hip/cufinufft_plan_t.hpp>
 #include <cufinufft/hip/heuristics.hpp>
 #include <cufinufft/hip/intrinsics.hpp>

@@ -117,14 +117,14 @@ private:
 
   static int get_orig_device() noexcept {
     int device{};
-    hipGetDevice(&device);
+    checkHipErrors(hipGetDevice(&device));
     return device;
   }
 
 public:
   explicit DeviceSwitcher(int newDevice) : orig_device{get_orig_device()} {
     if (auto err = hipSetDevice(newDevice); err != hipSuccess)
-      throw cufinufft::cuda_exception(err, "DeviceSwitcher::hipSetDevice");
+      throw cufinufft::hip_exception(err, "DeviceSwitcher::hipSetDevice");
   }
 
   ~DeviceSwitcher() {
@@ -165,7 +165,7 @@ public:
     auto err =
         pool ? hipMallocAsync(&p, n * sizeof(T), stream) : hipMalloc(&p, n * sizeof(T));
     if (err != hipSuccess)
-      throw cufinufft::cuda_exception(err, pool ? "hipMallocAsync" : "hipMalloc");
+      throw cufinufft::hip_exception(err, pool ? "hipMallocAsync" : "hipMalloc");
     return enthrust(p);
   }
 
