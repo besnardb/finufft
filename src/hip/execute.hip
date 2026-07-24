@@ -2,6 +2,8 @@
 // plus the deconvolve kernel that only the execute path uses.
 // Mirrors CPU src/execute.cpp.
 
+
+#include <hip/hip_runtime.h>
 #include <iostream>
 
 #include <cufinufft/contrib/helper_cuda.h>
@@ -81,7 +83,7 @@ void cufinufft_plan_t<T>::deconvolve_nd(
   bool fw2fk = spopts.spread_direction == 1;
   if (!fw2fk)
     checkCudaErrors(
-        cudaMemsetAsync(fw, 0, batchsize * nftot * sizeof(cuda_complex<T>), stream));
+        hipMemsetAsync(fw, 0, batchsize * nftot * sizeof(cuda_complex<T>), stream));
 
   for (int t = 0; t < blksize; t++)
     deconv_nd<T, modeord, ndim><<<(nmodes + 256 - 1) / 256, 256, 0, stream>>>(
@@ -135,7 +137,7 @@ void cufinufft_plan_t<T>::execute_type1(cuda_complex<T> *d_c, cuda_complex<T> *d
                                                    // section of the user output f
 
     checkCudaErrors(
-        cudaMemsetAsync(fw, 0, blksize * nf * sizeof(cuda_complex<T>), stream));
+        hipMemsetAsync(fw, 0, blksize * nf * sizeof(cuda_complex<T>), stream));
 
     // Step 1: Spread
     spreadSorted(c, fw, blksize);
@@ -143,8 +145,8 @@ void cufinufft_plan_t<T>::execute_type1(cuda_complex<T> *d_c, cuda_complex<T> *d
     if (opts.gpu_spreadinterponly) continue; // skip steps 2 and 3
 
     // Step 2: FFT
-    cufftResult cufft_status = cufft_ex(fftplan.get(), fw, fw, iflag);
-    if (cufft_status != CUFFT_SUCCESS)
+    hipfftResult cufft_status = cufft_ex(fftplan.get(), fw, fw, iflag);
+    if (cufft_status != HIPFFT_SUCCESS)
       throw cufinufft::cufft_exception(cufft_status, "cufft_ex_type1");
 
     // Step 3: deconvolve and shuffle
@@ -192,8 +194,8 @@ void cufinufft_plan_t<T>::execute_type2(cuda_complex<T> *d_c, cuda_complex<T> *d
 
       // Step 2: FFT
       THROW_IF_CUDA_ERROR();
-      cufftResult cufft_status = cufft_ex(fftplan.get(), fw, fw, iflag);
-      if (cufft_status != CUFFT_SUCCESS)
+      hipfftResult cufft_status = cufft_ex(fftplan.get(), fw, fw, iflag);
+      if (cufft_status != HIPFFT_SUCCESS)
         throw cufinufft::cufft_exception(cufft_status, "cufft_ex_type2");
     } else
       fw = fk; // interpolate directly from user input f
@@ -232,7 +234,7 @@ void cufinufft_plan_t<T>::execute_type3(cuda_complex<T> *d_c,
     auto *fk = fw;
     // NOTE: fw might need to be set to 0
     checkCudaErrors(
-        cudaMemsetAsync(fw, 0, blksize * nf * sizeof(cuda_complex<T>), stream));
+        hipMemsetAsync(fw, 0, blksize * nf * sizeof(cuda_complex<T>), stream));
     // Step 0: pre-phase the input strengths
     for (int block = 0; block < blksize; block++) {
       thrust::transform(thrust::cuda::par.on(stream), dethrust(prephase),

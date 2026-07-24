@@ -109,6 +109,13 @@ if(FINUFFT_USE_CUDA)
     list(APPEND INSTALL_TARGETS cufinufft)
 endif()
 
+if(FINUFFT_USE_HIP)
+    include(hip_setup)
+    add_subdirectory(src/hip)
+
+    list(APPEND INSTALL_TARGETS cufinufft)
+endif()
+
 # Add tests defined in their own directory
 if(BUILD_TESTING AND FINUFFT_USE_CPU AND FINUFFT_BUILD_TESTS)
     add_subdirectory(test)
