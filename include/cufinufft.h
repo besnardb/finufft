@@ -1,5 +1,9 @@
 // Defines the C++/C user interface to CUFINUFFT library.
+#ifdef CUFINUFFT_USE_HIP
+#include <hipfft/hipfft.h>
+#else
 #include <cufft.h>
+#endif
 
 #include <stdint.h>
 

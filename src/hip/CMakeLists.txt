@@ -42,7 +42,7 @@ set(CUFINUFFT_INCLUDE_DIRS
 
 set(CUFINUFFT_INCLUDE_DIRS ${CUFINUFFT_INCLUDE_DIRS} PARENT_SCOPE)
 
-list(APPEND FINUFFT_HIP_FLAGS $<$<COMPILE_LANGUAGE:HIP>:--extended-lambda --extra-device-vectorization>)
+list(APPEND FINUFFT_HIP_FLAGS $<$<COMPILE_LANGUAGE:HIP>:--offload-arch=${CMAKE_HIP_ARCHITECTURES}>)
 # -Wextra / -Wall are GCC/Clang spellings; nvcc forwards them to the host
 # compiler via -forward-unknown-to-host-compiler, where MSVC rejects /Wextra
 # with D8021. Only emit them when the host compiler understands them.
@@ -112,6 +112,10 @@ if(FINUFFT_SHARED_LINKING)
         target_compile_definitions(cufinufft PRIVATE dll_EXPORTS)
     endif()
 endif()
+
+target_compile_definitions(cufinufft
+    PUBLIC CUFINUFFT_USE_HIP
+)
 
 # BUILD_INTERFACE exposes deps to the library itself and to all build consumers
 # (tests, examples) without requiring them to list dependencies explicitly.
