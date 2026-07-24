@@ -8,7 +8,7 @@
 #include <memory>
 
 #include <cufinufft.h>
-#include <cufinufft/cufinufft_plan_t.hpp>
+#include <cufinufft/hip/cufinufft_plan_t.hpp>
 #include <finufft_common/safe_call.h>
 
 using finufft::common::safe_finufft_call;
