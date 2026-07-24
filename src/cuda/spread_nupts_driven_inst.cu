@@ -3,7 +3,7 @@
 // -DCUFINUFFT_DIM={1,2,3}; produces one object per dim.
 
 #include "spreadinterp_common.cuh"
-#include <cufinufft/spreadinterp.hpp>
+#include <cufinufft/cuda/spreadinterp.hpp>
 #include <poet/poet.hpp>
 
 #ifndef CUFINUFFT_DIM

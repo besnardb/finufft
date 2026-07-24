@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-#include <cufinufft/cufinufft_plan_t.hpp>
+#include <cufinufft/cuda/cufinufft_plan_t.hpp>
 #include <finufft_errors.h>
 
 template<typename T> void cufinufft_plan_t<T>::indexSort() {

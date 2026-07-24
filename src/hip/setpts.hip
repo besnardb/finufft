@@ -9,10 +9,10 @@
 #include <cufinufft/contrib/helper_math.h>
 
 #include <cufinufft.h>
-#include <cufinufft/fft.hpp>
-#include <cufinufft/spreadinterp.hpp>
-#include <cufinufft/types.hpp>
-#include <cufinufft/utils.hpp>
+#include <cufinufft/hip/fft.hpp>
+#include <cufinufft/hip/spreadinterp.hpp>
+#include <cufinufft/hip/types.hpp>
+#include <cufinufft/hip/utils.hpp>
 
 #include <finufft_common/constants.h>
 #include <finufft_errors.h>

@@ -2,7 +2,7 @@
 
 
 #include <hip/hip_runtime.h>
-#include <cufinufft/spreadinterp.hpp>
+#include <cufinufft/hip/spreadinterp.hpp>
 #include <poet/poet.hpp>
 
 namespace cufinufft {

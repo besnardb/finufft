@@ -13,9 +13,9 @@
 #include <hip/hip_runtime.h>
 
 #include <cufinufft/contrib/helper_hip.h>
-#include <cufinufft/heuristics.hpp>
-#include <cufinufft/spreadinterp.hpp>
-#include <cufinufft/utils.hpp>
+#include <cufinufft/hip/heuristics.hpp>
+#include <cufinufft/hip/spreadinterp.hpp>
+#include <cufinufft/hip/utils.hpp>
 
 namespace cufinufft {
 namespace common {

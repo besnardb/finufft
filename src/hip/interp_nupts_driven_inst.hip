@@ -2,7 +2,7 @@
 // Per-dim instantiation TU: nupts-driven interp (gpu_method = 1).
 // Compiled three times via CMake foreach with -DCUFINUFFT_DIM={1,2,3}.
 
-#include <cufinufft/spreadinterp.hpp>
+#include <cufinufft/hip/spreadinterp.hpp>
 #include <poet/poet.hpp>
 #ifndef CUFINUFFT_DIM
 #error "CUFINUFFT_DIM must be defined to 1, 2, or 3 (set by CMake)"

@@ -10,7 +10,7 @@
 #include <hip/hip_runtime.h>
 #include <iostream>
 
-#include <cufinufft/cufinufft_plan_t.hpp>
+#include <cufinufft/hip/cufinufft_plan_t.hpp>
 #include <finufft_errors.h>
 
 template<typename T> void cufinufft_plan_t<T>::indexSort() {

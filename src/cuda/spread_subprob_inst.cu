@@ -3,7 +3,7 @@
 // Also instantiates the prep helper shared with output-driven (gpu_method = 3).
 
 #include "spreadinterp_common.cuh"
-#include <cufinufft/spreadinterp.hpp>
+#include <cufinufft/cuda/spreadinterp.hpp>
 #include <poet/poet.hpp>
 
 #ifndef CUFINUFFT_DIM

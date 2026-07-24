@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cufinufft/spreadinterp.hpp>
+#include <cufinufft/cuda/spreadinterp.hpp>
 
 namespace cufinufft {
 namespace spreadinterp {

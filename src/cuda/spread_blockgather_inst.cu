@@ -1,6 +1,6 @@
 // Per-dim instantiation TU: 3D block-gather spread (gpu_method = 4), Ndim = 3.
 
-#include <cufinufft/spreadinterp.hpp>
+#include <cufinufft/cuda/spreadinterp.hpp>
 #include <poet/poet.hpp>
 
 namespace cufinufft {

@@ -9,10 +9,10 @@
 #include <cuComplex.h>
 #include <cuda.h>
 
-#include <cufinufft/contrib/helper_cuda.h>
-#include <cufinufft/fft.hpp>
-#include <cufinufft/spreadinterp.hpp>
-#include <cufinufft/utils.hpp>
+#include <cufinufft/cuda/contrib/helper_cuda.h>
+#include <cufinufft/cuda/fft.hpp>
+#include <cufinufft/cuda/spreadinterp.hpp>
+#include <cufinufft/cuda/utils.hpp>
 
 namespace cufinufft {
 namespace common {

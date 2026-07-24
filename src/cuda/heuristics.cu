@@ -13,9 +13,9 @@
 #include <cuda.h>
 
 #include <cufinufft/contrib/helper_cuda.h>
-#include <cufinufft/heuristics.hpp>
-#include <cufinufft/spreadinterp.hpp>
-#include <cufinufft/utils.hpp>
+#include <cufinufft/cuda/heuristics.hpp>
+#include <cufinufft/cuda/spreadinterp.hpp>
+#include <cufinufft/cuda/utils.hpp>
 
 namespace cufinufft {
 namespace common {

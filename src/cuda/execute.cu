@@ -8,9 +8,9 @@
 #include <cufinufft/contrib/helper_math.h>
 
 #include <cufinufft.h>
-#include <cufinufft/spreadinterp.hpp>
-#include <cufinufft/types.hpp>
-#include <cufinufft/utils.hpp>
+#include <cufinufft/cuda/spreadinterp.hpp>
+#include <cufinufft/cuda/types.hpp>
+#include <cufinufft/cuda/utils.hpp>
 
 #include <finufft_common/constants.h>
 #include <finufft_errors.h>

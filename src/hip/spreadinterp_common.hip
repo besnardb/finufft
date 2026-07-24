@@ -10,7 +10,7 @@
 #include <hip/hip_runtime.h>
 
 
-#include <cufinufft/spreadinterp.hpp>
+#include <cufinufft/hip/spreadinterp.hpp>
 
 namespace cufinufft {
 namespace spreadinterp {
