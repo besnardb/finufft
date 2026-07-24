@@ -228,7 +228,9 @@ __global__ void spread_3d_block_gather(cufinufft_gpu_data<T> p, const cuda_compl
     for (int idim = 0; idim < ndim; ++idim) {
       const auto rescaled =
           fold_rescale(p.xyz[idim][ii], p.nf123[idim]) + box[idim] * p.nf123[idim];
-      auto [start_, end] = interval(ns, rescaled);
+      auto interval_result = interval(ns, rescaled);
+      int start_ = interval_result.x;
+      int end = interval_result.y;
 
       const T pos = T(start_) - rescaled;
       start_ -= offset[idim];
