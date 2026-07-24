@@ -4,8 +4,8 @@
 #include <array>
 #include <hip/hip_runtime.h>
 
-#include <cufinufft/cufinufft_plan_t.hpp>
-#include <cufinufft/types.hpp>
+#include <cufinufft/hip/cufinufft_plan_t.hpp>
+#include <cufinufft/hip/types.hpp>
 #include <finufft_common/spread_opts.h>
 
 namespace cufinufft::common {
