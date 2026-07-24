@@ -170,48 +170,44 @@ __host__ __device__ __forceinline__ hipFloatComplex operator/(
   return make_hipFloatComplex((a * hipCrealf(b)) / denom, (-a * hipCimagf(b)) / denom);
 }
 
-template<typename T>
-__device__ inline hip_complex<T> complex_mul_real(
-    hip_complex<T> a, T b);
-
-
-template<>
-__device__ inline hipFloatComplex complex_mul_real(
+__device__ __forceinline__ hipFloatComplex complex_mul_real(
     hipFloatComplex a, float b)
 {
-    return hipCmulf(a, make_hipFloatComplex(b,0));
+    hipFloatComplex r;
+    r.x = a.x * b;
+    r.y = a.y * b;
+    return r;
 }
 
 
-template<>
-__device__ inline hipDoubleComplex complex_mul_real(
+__device__ __forceinline__ hipDoubleComplex complex_mul_real(
     hipDoubleComplex a, double b)
 {
-    return hipCmul(a, make_hipDoubleComplex(b,0));
+    hipDoubleComplex r;
+    r.x = a.x * b;
+    r.y = a.y * b;
+    return r;
 }
 
-
-template<typename T>
-__device__ inline hip_complex<T> complex_add(
-    hip_complex<T> a,
-    hip_complex<T> b);
-
-
-template<>
-__device__ inline hipFloatComplex complex_add<float>(
+__device__ __forceinline__ hipFloatComplex complex_add(
     hipFloatComplex a,
     hipFloatComplex b)
 {
-    return hipCaddf(a, b);
+    hipFloatComplex r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    return r;
 }
 
 
-template<>
-__device__ inline hipDoubleComplex complex_add<double>(
+__device__ __forceinline__ hipDoubleComplex complex_add(
     hipDoubleComplex a,
     hipDoubleComplex b)
 {
-    return hipCadd(a, b);
+    hipDoubleComplex r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    return r;
 }
 
 /* Auxiliary func to compute power of complex number */
