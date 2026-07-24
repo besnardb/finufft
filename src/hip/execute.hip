@@ -82,7 +82,7 @@ void cufinufft_plan_t<T>::deconvolve_nd(
 
   bool fw2fk = spopts.spread_direction == 1;
   if (!fw2fk)
-    checkCudaErrors(
+    checkHipErrors(
         hipMemsetAsync(fw, 0, batchsize * nftot * sizeof(hip_complex<T>), stream));
 
   for (int t = 0; t < blksize; t++)
@@ -136,7 +136,7 @@ void cufinufft_plan_t<T>::execute_type1(hip_complex<T> *d_c, hip_complex<T> *d_f
       fw = fk;                                     // spread directly into the appropriate
                                                    // section of the user output f
 
-    checkCudaErrors(
+    checkHipErrors(
         hipMemsetAsync(fw, 0, blksize * nf * sizeof(hip_complex<T>), stream));
 
     // Step 1: Spread
@@ -233,11 +233,11 @@ void cufinufft_plan_t<T>::execute_type3(hip_complex<T> *d_c,
     // setting output for spreader
     auto *fk = fw;
     // NOTE: fw might need to be set to 0
-    checkCudaErrors(
+    checkHipErrors(
         hipMemsetAsync(fw, 0, blksize * nf * sizeof(hip_complex<T>), stream));
     // Step 0: pre-phase the input strengths
     for (int block = 0; block < blksize; block++) {
-      thrust::transform(thrust::cuda::par.on(stream), dethrust(prephase),
+      thrust::transform(thrust::hip::par.on(stream), dethrust(prephase),
                         dethrust(prephase) + M, d_cstart + block * M, c + block * M,
                         thrust::multiplies<hip_complex<T>>());
     }
@@ -252,7 +252,7 @@ void cufinufft_plan_t<T>::execute_type3(hip_complex<T> *d_c,
     // Step 3: deconvolve
     // now we need to d_fk = d_fk*deconv
     for (int j = 0; j < blksize; j++) {
-      thrust::transform(thrust::cuda::par.on(stream), dethrust(deconv),
+      thrust::transform(thrust::hip::par.on(stream), dethrust(deconv),
                         dethrust(deconv) + N, d_fkstart + j * N, d_fkstart + j * N,
                         thrust::multiplies<hip_complex<T>>());
     }

@@ -82,9 +82,9 @@ template<typename T> auto arrayrange(int n, const T *a, hipStream_t stream) {
 
   // copy d_min and d_max to host
   T min{}, max{};
-  checkCudaErrors(hipMemcpyAsync(&min, thrust::raw_pointer_cast(d_min_max.first),
+  checkHipErrors(hipMemcpyAsync(&min, thrust::raw_pointer_cast(d_min_max.first),
                                   sizeof(T), hipMemcpyDeviceToHost, stream));
-  checkCudaErrors(hipMemcpyAsync(&max, thrust::raw_pointer_cast(d_min_max.second),
+  checkHipErrors(hipMemcpyAsync(&max, thrust::raw_pointer_cast(d_min_max.second),
                                   sizeof(T), hipMemcpyDeviceToHost, stream));
   return std::make_tuple(min, max);
 }

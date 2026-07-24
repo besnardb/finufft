@@ -369,7 +369,7 @@ cufinufft_plan_t<T>::cufinufft_plan_t(int type_, int dim_, const int *nmodes, in
       fftplan.set_device_id(opts.gpu_device_id);
       hipfftResult_t cufft_status =
           hipfftPlanMany(fftplan.for_creation(), dim, n, n, 1, ntot, n, 1, ntot,
-                        cufft_type<T>(), batchsize);
+                        hipfft_type<T>(), batchsize);
 
       if (cufft_status != HIPFFT_SUCCESS)
         throw cufinufft::cufft_exception(cufft_status, "hipfftPlanMany");

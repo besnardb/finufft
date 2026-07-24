@@ -168,7 +168,7 @@ void cufinufft_plan_t<T>::setpts(int nj, const T *d_kx, const T *d_ky, const T *
   for (int idim = 0; idim < dim; ++idim) {
     const auto ig = T(1) / type3_params.gam[idim];
     const auto C  = -type3_params.C[idim];
-    thrust::transform(thrust::cuda::par.on(stream), d_kxyz[idim], d_kxyz[idim] + M,
+    thrust::transform(thrust::hip::par.on(stream), d_kxyz[idim], d_kxyz[idim] + M,
                       dethrust(kxyzp[idim]), [ig, C] __host__ __device__(const T x) -> T {
                         return (x + C) * ig;
                       });
@@ -186,7 +186,7 @@ void cufinufft_plan_t<T>::setpts(int nj, const T *d_kx, const T *d_ky, const T *
     const auto D        = type3_params.D;
     const auto realsign = iflag >= 0 ? T(1) : T(-1);
     thrust::transform(
-        thrust::cuda::par.on(stream), iterator, iterator + M, dethrust(prephase),
+        thrust::hip::par.on(stream), iterator, iterator + M, dethrust(prephase),
         [D, realsign] __host__
         __device__(const thrust::tuple<T, T, T> &tuple) -> hip_complex<T> {
           const auto x = thrust::get<0>(tuple);
@@ -201,7 +201,7 @@ void cufinufft_plan_t<T>::setpts(int nj, const T *d_kx, const T *d_ky, const T *
           return hip_complex<T>{std::cos(phase), std::sin(phase) * realsign};
         });
   } else {
-    thrust::fill(thrust::cuda::par.on(stream), dethrust(prephase), dethrust(prephase) + M,
+    thrust::fill(thrust::hip::par.on(stream), dethrust(prephase), dethrust(prephase) + M,
                  hip_complex<T>{1, 0});
   }
 
@@ -209,7 +209,7 @@ void cufinufft_plan_t<T>::setpts(int nj, const T *d_kx, const T *d_ky, const T *
     const auto scale = type3_params.h[idim] * type3_params.gam[idim];
     const auto D     = -type3_params.D[idim];
     thrust::transform(
-        thrust::cuda::par.on(stream), d_stu[idim], d_stu[idim] + N, dethrust(STUp[idim]),
+        thrust::hip::par.on(stream), d_stu[idim], d_stu[idim] + N, dethrust(STUp[idim]),
         [scale, D] __host__ __device__(const T s) -> T { return scale * (s + D); });
   }
   { // here we declare phi_hat1, phi_hat2, and phi_hat3
@@ -247,7 +247,7 @@ void cufinufft_plan_t<T>::setpts(int nj, const T *d_kx, const T *d_ky, const T *
                            // to avoid out of bounds access, use phi_hat1 if dim < 3
                            dim > 2 ? phi_hat123[2].data() : phi_hat123[0].data()));
     auto xdim = dim;
-    thrust::transform(thrust::cuda::par.on(stream), phi_hat_iterator,
+    thrust::transform(thrust::hip::par.on(stream), phi_hat_iterator,
                       phi_hat_iterator + N, dethrust(deconv),
                       [xdim] __host__
                       __device__(const thrust::tuple<T, T, T> tuple) -> hip_complex<T> {
@@ -271,7 +271,7 @@ void cufinufft_plan_t<T>::setpts(int nj, const T *d_kx, const T *d_ky, const T *
       const auto phase_iterator = thrust::make_zip_iterator(
           thrust::make_tuple(d_s, dim > 1 ? d_t : d_s, dim > 2 ? d_u : d_s));
       thrust::transform(
-          thrust::cuda::par.on(stream), phase_iterator, phase_iterator + N,
+          thrust::hip::par.on(stream), phase_iterator, phase_iterator + N,
           dethrust(deconv), dethrust(deconv),
           [c1, c2, c3, d1, d2, d3, realsign] __host__
           __device__(const thrust::tuple<T, T, T> tuple,

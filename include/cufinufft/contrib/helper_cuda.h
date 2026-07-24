@@ -33,54 +33,94 @@
 #include <finufft_common/safe_call.h>
 #include <finufft_errors.h>
 
+#ifdef CUFINUFFT_USE_HIP
+#include <hip/hip_runtime.h>
+#include <hipfft/hipfft.h>
+
+using fftResult = hipfftResult;
+#define FFT_SUCCESS HIPFFT_SUCCESS
+#define FFT_INVALID_PLAN HIPFFT_INVALID_PLAN
+#define FFT_ALLOC_FAILED HIPFFT_ALLOC_FAILED
+#define FFT_INVALID_TYPE HIPFFT_INVALID_TYPE
+#define FFT_INVALID_VALUE HIPFFT_INVALID_VALUE
+#define FFT_INTERNAL_ERROR HIPFFT_INTERNAL_ERROR
+#define FFT_EXEC_FAILED HIPFFT_EXEC_FAILED
+#define FFT_SETUP_FAILED HIPFFT_SETUP_FAILED
+#define FFT_INVALID_SIZE HIPFFT_INVALID_SIZE
+#define FFT_UNALIGNED_DATA HIPFFT_UNALIGNED_DATA
+#define FFT_INVALID_DEVICE HIPFFT_INVALID_DEVICE
+#define FFT_NO_WORKSPACE HIPFFT_NO_WORKSPACE
+#define FFT_NOT_IMPLEMENTED HIPFFT_NOT_IMPLEMENTED
+#define FFT_NOT_SUPPORTED HIPFFT_NOT_SUPPORTED
+
+#else
+
 #include <cuda_runtime.h>
 #include <cufft.h>
+
+using fftResult = cufftResult;
+#define FFT_SUCCESS CUFFT_SUCCESS
+#define FFT_INVALID_PLAN CUFFT_INVALID_PLAN
+#define FFT_ALLOC_FAILED CUFFT_ALLOC_FAILED
+#define FFT_INVALID_TYPE CUFFT_INVALID_TYPE
+#define FFT_INVALID_VALUE CUFFT_INVALID_VALUE
+#define FFT_INTERNAL_ERROR CUFFT_INTERNAL_ERROR
+#define FFT_EXEC_FAILED CUFFT_EXEC_FAILED
+#define FFT_SETUP_FAILED CUFFT_SETUP_FAILED
+#define FFT_INVALID_SIZE CUFFT_INVALID_SIZE
+#define FFT_UNALIGNED_DATA CUFFT_UNALIGNED_DATA
+#define FFT_INVALID_DEVICE CUFFT_INVALID_DEVICE
+#define FFT_NO_WORKSPACE CUFFT_NO_WORKSPACE
+#define FFT_NOT_IMPLEMENTED CUFFT_NOT_IMPLEMENTED
+#define FFT_NOT_SUPPORTED CUFFT_NOT_SUPPORTED
+
+#endif
 
 namespace cufinufft {
 
 inline const char *cufftGetErrorString(cufftResult error) {
   switch (error) {
-  case CUFFT_SUCCESS:
-    return "CUFFT_SUCCESS";
+  case FFT_SUCCESS:
+    return "FFT_SUCCESS";
 
-  case CUFFT_INVALID_PLAN:
-    return "CUFFT_INVALID_PLAN";
+  case FFT_INVALID_PLAN:
+    return "FFT_INVALID_PLAN";
 
-  case CUFFT_ALLOC_FAILED:
-    return "CUFFT_ALLOC_FAILED";
+  case FFT_ALLOC_FAILED:
+    return "FFT_ALLOC_FAILED";
 
-  case CUFFT_INVALID_TYPE:
-    return "CUFFT_INVALID_TYPE";
+  case FFT_INVALID_TYPE:
+    return "FFT_INVALID_TYPE";
 
-  case CUFFT_INVALID_VALUE:
-    return "CUFFT_INVALID_VALUE";
+  case FFT_INVALID_VALUE:
+    return "FFT_INVALID_VALUE";
 
-  case CUFFT_INTERNAL_ERROR:
-    return "CUFFT_INTERNAL_ERROR";
+  case FFT_INTERNAL_ERROR:
+    return "FFT_INTERNAL_ERROR";
 
-  case CUFFT_EXEC_FAILED:
-    return "CUFFT_EXEC_FAILED";
+  case FFT_EXEC_FAILED:
+    return "FFT_EXEC_FAILED";
 
-  case CUFFT_SETUP_FAILED:
-    return "CUFFT_SETUP_FAILED";
+  case FFT_SETUP_FAILED:
+    return "FFT_SETUP_FAILED";
 
-  case CUFFT_INVALID_SIZE:
-    return "CUFFT_INVALID_SIZE";
+  case FFT_INVALID_SIZE:
+    return "FFT_INVALID_SIZE";
 
-  case CUFFT_UNALIGNED_DATA:
-    return "CUFFT_UNALIGNED_DATA";
+  case FFT_UNALIGNED_DATA:
+    return "FFT_UNALIGNED_DATA";
 
-  case CUFFT_INVALID_DEVICE:
-    return "CUFFT_INVALID_DEVICE";
+  case FFT_INVALID_DEVICE:
+    return "FFT_INVALID_DEVICE";
 
-  case CUFFT_NO_WORKSPACE:
-    return "CUFFT_NO_WORKSPACE";
+  case FFT_NO_WORKSPACE:
+    return "FFT_NO_WORKSPACE";
 
-  case CUFFT_NOT_IMPLEMENTED:
-    return "CUFFT_NOT_IMPLEMENTED";
+  case FFT_NOT_IMPLEMENTED:
+    return "FFT_NOT_IMPLEMENTED";
 
-  case CUFFT_NOT_SUPPORTED:
-    return "CUFFT_NOT_SUPPORTED";
+  case FFT_NOT_SUPPORTED:
+    return "FFT_NOT_SUPPORTED";
 
 // Deprecated in cuFFT 12.9, removed in cuFFT 13. Only reference them when
 // compiling with nvcc < 13 (where the enums exist). `__CUDACC_VER_MAJOR__`
@@ -136,31 +176,40 @@ private:
   }
 };
 
-class cufft_exception final : public finufft::exception {
+class fft_exception final : public finufft::exception {
 public:
-  cufft_exception(cufftResult err, const char *op, const char *file = nullptr,
-                  int line = 0)
-      : finufft::exception(FINUFFT_ERR_CUDA_FAILURE, format(err, op, file, line)),
-        cufft_code_(err) {}
+  fft_exception(fftResult err, const char *op,
+                const char *file = nullptr, int line = 0)
+      : finufft::exception(FINUFFT_ERR_CUDA_FAILURE,
+                           format(err, op, file, line)),
+        fft_code_(err) {}
 
-  cufftResult cufft_code() const noexcept { return cufft_code_; }
+  fftResult fft_code() const noexcept {
+    return fft_code_;
+  }
 
 private:
-  cufftResult cufft_code_;
+  fftResult fft_code_;
 
-  static std::string format(cufftResult e, const char *op, const char *file, int line) {
-    std::string s = op ? op : "<unknown>";
-    if (file) {
-      s += " @ ";
-      s += file;
-      s += ":";
-      s += std::to_string(line);
-    }
-    s += ": ";
-    s += cufftGetErrorString(e);
-    return s;
-  }
-};
+  static std::string format(
+      fftResult e,
+      const char *op,
+      const char *file,
+      int line)
+  {
+      std::string s = op ? op : "<unknown>";
+
+      s += ": ";
+
+      #ifdef CUFINUFFT_USE_HIP
+            s += hipfftGetErrorString(e);
+      #else
+            s += cufftGetErrorString(e);
+      #endif
+
+            return s;
+        }
+      };
 
 namespace detail {
 
