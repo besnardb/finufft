@@ -3,7 +3,7 @@
 
 #include <array>
 #include <hipfft/hipfft.h>
-#include <cufinufft/contrib/helper_cuda.h>
+#include <cufinufft/contrib/helper_hip.h>
 #include <cufinufft/hip/types.hpp>
 #include <cufinufft_opts.h>
 #include <finufft_common/safe_call.h>
