@@ -30,7 +30,7 @@ __global__ FINUFFT_FLATTEN void interp_nupts_driven(
     if constexpr (ndim == 1) {
       for (int x0 = 0, ix = start[0]; x0 < ns;
            ++x0, ix       = (ix + 1 >= p.nf123[0]) ? 0 : ix + 1)
-        cnow += loadReadOnly(fw + ix) * ker[0][x0];
+        cnow = complex_add(cnow, complex_mul_real(loadReadOnly(fw + ix), ker[0][x0]));
     } else if constexpr (ndim == 2) {
       for (int y0 = 0, iy = start[1]; y0 < ns;
            ++y0, iy       = (iy + 1 >= p.nf123[1]) ? 0 : iy + 1) {
@@ -38,7 +38,7 @@ __global__ FINUFFT_FLATTEN void interp_nupts_driven(
         cuda_complex<T> cnowx{0, 0};
         for (int x0 = 0, ix = start[0]; x0 < ns;
              ++x0, ix       = (ix + 1 >= p.nf123[0]) ? 0 : ix + 1)
-          cnowx += loadReadOnly(fw + inidx0 + ix) * ker[0][x0];
+          cnow = complex_add(cnow, complex_mul_real(loadReadOnly(fw + inidx0 + ix), ker[0][x0]));
         cnow += cnowx * ker[1][y0];
       }
     }
@@ -56,7 +56,7 @@ __global__ FINUFFT_FLATTEN void interp_nupts_driven(
           const auto inidx1 = inidx0 + iy * p.nf123[0];
           cuda_complex<T> cnowx{0, 0};
           for (int x0 = 0; x0 < ns; ++x0)
-            cnowx += loadReadOnly(fw + inidx1 + xidx[x0]) * ker[0][x0];
+            cnowx = complex_add(cnow, complex_mul_real(loadReadOnly(fw + inidx1 + xidx[x0]), ker[0][x0]));
           cnowy += cnowx * ker[1][y0];
         }
         cnow += cnowy * ker[2][z0];
