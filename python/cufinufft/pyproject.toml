@@ -42,7 +42,7 @@ editable.mode = "redirect"
 # Tell skbuild to where to find CMakeLists.txt.
 cmake.source-dir = "../../"
 cmake.targets = ["cufinufft"]
-cmake.define = {"FINUFF_BUILD_PYTHON" = "ON", "FINUFFT_USE_CUDA" = "OFF",  "FINUFFT_USE_HIP" = "ON", "FINUFFT_USE_CPU" = "OFF", "FINUFFT_ARCH_FLAGS" = ""}
+cmake.define = {"FINUFFT_BUILD_PYTHON" = "ON", "FINUFFT_USE_CUDA" = "OFF",  "FINUFFT_USE_HIP" = "ON", "FINUFFT_USE_CPU" = "OFF", "FINUFFT_ARCH_FLAGS" = ""}
 cmake.args = ["-G Ninja"]
 wheel.packages = ["cufinufft"]
 
