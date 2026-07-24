@@ -7,10 +7,10 @@
 
 #include <cufinufft/contrib/helper_cuda.h>
 #include <cufinufft/contrib/helper_math.h>
-#include <cufinufft/cufinufft_plan_t.hpp>
-#include <cufinufft/heuristics.hpp>
-#include <cufinufft/intrinsics.hpp>
-#include <cufinufft/utils.hpp>
+#include <cufinufft/cuda/cufinufft_plan_t.hpp>
+#include <cufinufft/cuda/heuristics.hpp>
+#include <cufinufft/cuda/intrinsics.hpp>
+#include <cufinufft/cuda/utils.hpp>
 #include <finufft_common/spread_opts.h>
 
 namespace cufinufft {

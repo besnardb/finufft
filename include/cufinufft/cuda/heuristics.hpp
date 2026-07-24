@@ -6,7 +6,7 @@
 
 #include <cuda_runtime.h>
 
-#include <cufinufft/cufinufft_plan_t.hpp>
+#include <cufinufft/cuda/cufinufft_plan_t.hpp>
 #include <cufinufft_opts.h>
 #include <finufft_common/safe_call.h>
 #include <finufft_errors.h>

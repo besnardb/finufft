@@ -4,8 +4,8 @@
 #include <cuda/std/array>
 #include <cuda_runtime.h>
 
-#include <cufinufft/cufinufft_plan_t.hpp>
-#include <cufinufft/types.hpp>
+#include <cufinufft/cuda/cufinufft_plan_t.hpp>
+#include <cufinufft/cuda/types.hpp>
 #include <finufft_common/spread_opts.h>
 
 namespace cufinufft::common {

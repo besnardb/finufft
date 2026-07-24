@@ -26,6 +26,7 @@ enum {
   FINUFFT_ERR_SPREAD_THREAD_NOTVALID               = 13,
   FINUFFT_ERR_NDATA_NOTVALID                       = 14,
   FINUFFT_ERR_CUDA_FAILURE                         = 15,
+  FINUFFT_ERR_HIP_FAILURE                          = 15,
   FINUFFT_ERR_PLAN_NOTVALID                        = 16,
   FINUFFT_ERR_METHOD_NOTVALID                      = 17,
   FINUFFT_ERR_BINSIZE_NOTVALID                     = 18,
@@ -38,6 +39,7 @@ enum {
   FINUFFT_ERR_UNKNOWN_EXCEPTION                    = 25,
   FINUFFT_ERR_EPS_TOO_SMALL                        = 26,
   FINUFFT_ERR_PSWF_SETUP                           = 27,
+
 };
 // clang-format on
 #endif

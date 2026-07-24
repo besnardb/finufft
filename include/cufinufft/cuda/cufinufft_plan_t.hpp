@@ -4,7 +4,7 @@
 #include <cuda/std/array>
 #include <cufft.h>
 #include <cufinufft/contrib/helper_cuda.h>
-#include <cufinufft/types.hpp>
+#include <cufinufft/cuda/types.hpp>
 #include <cufinufft_opts.h>
 #include <finufft_common/safe_call.h>
 #include <finufft_common/spread_opts.h>
