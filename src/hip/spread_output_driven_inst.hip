@@ -100,7 +100,7 @@ __global__ FINUFFT_FLATTEN void spread_output_driven(
   for (int n = threadIdx.x; n < local_subgrid_size; n += blockDim.x) {
     const int outidx =
         output_index_from_flat_local_index<ndim, ns>(n, padded_size, offset, p.nf123);
-    atomicAddComplex<T>(fw + outidx, local_subgrid[n]);
+    atomicAddComplexGlobal<T>(fw + outidx, local_subgrid[n]);
   }
 }
 

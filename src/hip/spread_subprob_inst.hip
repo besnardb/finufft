@@ -55,7 +55,7 @@ __global__ FINUFFT_FLATTEN void spread_subprob(
     if constexpr (ndim == 1) {
       const auto ofs = start[0] + ns_2;
       for (int xx = 0; xx < ns; ++xx) {
-        atomicAddComplex<T>(fwshared + xx + ofs, cnow * ker[0][xx]);
+        atomicAddComplexGlobal<T>(fwshared + xx + ofs, cnow * ker[0][xx]);
       }
     }
     if constexpr (ndim == 2) {
@@ -65,7 +65,7 @@ __global__ FINUFFT_FLATTEN void spread_subprob(
         const auto ofs   = ofs0 + yy * delta_y;
         const auto cnowy = cnow * ker[1][yy];
         for (int xx = 0; xx < ns; ++xx) {
-          atomicAddComplex<T>(fwshared + xx + ofs, cnowy * ker[0][xx]);
+          atomicAddComplexGlobal<T>(fwshared + xx + ofs, cnowy * ker[0][xx]);
         }
       }
     }
@@ -81,7 +81,7 @@ __global__ FINUFFT_FLATTEN void spread_subprob(
           const auto cnowy = cnowz * ker[1][yy];
           const auto ofs   = ofs1 + yy * delta_y;
           for (int xx = 0; xx < ns; ++xx) {
-            atomicAddComplex<T>(fwshared + xx + ofs, cnowy * ker[0][xx]);
+            atomicAddComplexGlobal<T>(fwshared + xx + ofs, cnowy * ker[0][xx]);
           }
         }
       }
@@ -93,7 +93,7 @@ __global__ FINUFFT_FLATTEN void spread_subprob(
   /* write to global memory */
   shared_mem_copy_helper<T, ndim, ns>(
       binsizes, offset, p.nf123, [fw, fwshared](int idx_shared, int idx_global) {
-        atomicAddComplex<T>(fw + idx_global, fwshared[idx_shared]);
+        atomicAddComplexGlobal<T>(fw + idx_global, fwshared[idx_shared]);
       });
 }
 
