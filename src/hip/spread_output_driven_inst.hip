@@ -5,6 +5,7 @@
 
 #include "spreadinterp_common.cuh"
 #include <cufinufft/hip/spreadinterp.hpp>
+#include <cufinufft/hip/utils.hpp>
 #include <poet/poet.hpp>
 #define CUFINUFFT_DIM 1
 #ifndef CUFINUFFT_DIM
@@ -53,7 +54,8 @@ __global__ FINUFFT_FLATTEN void spread_output_driven(
 
   // set local_subgrid to zero
   for (int i = threadIdx.x; i < local_subgrid_size; i += blockDim.x) {
-    local_subgrid[i] = {0, 0};
+    local_subgrid[i].x = 0;
+    local_subgrid[i].y = 0;
   }
 
   __syncthreads();
@@ -91,7 +93,8 @@ __global__ FINUFFT_FLATTEN void spread_output_driven(
         kervalue *= kerevals[i][ndim - 1][tmp];
         idxout += strideout * (tmp + start[ndim - 1] + ns_2);
 
-        local_subgrid[idxout] += cnow * kervalue;
+        local_subgrid[idxout].x += cnow.x * kervalue;
+        local_subgrid[idxout].y += cnow.y * kervalue;
       }
       __syncthreads();
     }
