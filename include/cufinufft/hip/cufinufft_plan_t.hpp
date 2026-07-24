@@ -55,47 +55,47 @@ template<typename T> struct cufinufft_gpu_data;
 namespace cufinufft {
 namespace spreadinterp {
 template<typename T, int ndim, int ns>
-void spread_nupts_driven_launch(const cufinufft_plan_t<T> &, const cuda_complex<T> *,
-                                cuda_complex<T> *, int);
+void spread_nupts_driven_launch(const cufinufft_plan_t<T> &, const hip_complex<T> *,
+                                hip_complex<T> *, int);
 template<typename T, int ndim, int ns>
-void spread_subprob_launch(const cufinufft_plan_t<T> &, const cuda_complex<T> *,
-                           cuda_complex<T> *, int);
+void spread_subprob_launch(const cufinufft_plan_t<T> &, const hip_complex<T> *,
+                           hip_complex<T> *, int);
 template<typename T, int ndim, int ns>
-void spread_output_driven_launch(const cufinufft_plan_t<T> &, const cuda_complex<T> *,
-                                 cuda_complex<T> *, int);
+void spread_output_driven_launch(const cufinufft_plan_t<T> &, const hip_complex<T> *,
+                                 hip_complex<T> *, int);
 template<typename T, int ndim, int ns>
-void spread_blockgather_3d_launch(const cufinufft_plan_t<T> &, const cuda_complex<T> *,
-                                  cuda_complex<T> *, int);
+void spread_blockgather_3d_launch(const cufinufft_plan_t<T> &, const hip_complex<T> *,
+                                  hip_complex<T> *, int);
 template<typename T, int ndim, int ns>
-void interp_nupts_driven_launch(const cufinufft_plan_t<T> &, cuda_complex<T> *,
-                                const cuda_complex<T> *, int);
+void interp_nupts_driven_launch(const cufinufft_plan_t<T> &, hip_complex<T> *,
+                                const hip_complex<T> *, int);
 template<typename T, int ndim, int ns>
-void interp_subprob_launch(const cufinufft_plan_t<T> &, cuda_complex<T> *,
-                           const cuda_complex<T> *, int);
+void interp_subprob_launch(const cufinufft_plan_t<T> &, hip_complex<T> *,
+                           const hip_complex<T> *, int);
 
 template<typename T, int Ndim>
-void do_spread_nupts_driven(const cufinufft_plan_t<T> &, const cuda_complex<T> *,
-                            cuda_complex<T> *, int);
+void do_spread_nupts_driven(const cufinufft_plan_t<T> &, const hip_complex<T> *,
+                            hip_complex<T> *, int);
 template<typename T, int Ndim>
-void do_spread_subprob(const cufinufft_plan_t<T> &, const cuda_complex<T> *,
-                       cuda_complex<T> *, int);
+void do_spread_subprob(const cufinufft_plan_t<T> &, const hip_complex<T> *,
+                       hip_complex<T> *, int);
 template<typename T, int Ndim>
-void do_spread_output_driven(const cufinufft_plan_t<T> &, const cuda_complex<T> *,
-                             cuda_complex<T> *, int);
+void do_spread_output_driven(const cufinufft_plan_t<T> &, const hip_complex<T> *,
+                             hip_complex<T> *, int);
 template<typename T>
-void do_spread_blockgather_3d(const cufinufft_plan_t<T> &, const cuda_complex<T> *,
-                              cuda_complex<T> *, int);
+void do_spread_blockgather_3d(const cufinufft_plan_t<T> &, const hip_complex<T> *,
+                              hip_complex<T> *, int);
 
 template<typename T, int Ndim> void do_indexSort_nupts_driven(cufinufft_plan_t<T> &);
 template<typename T, int Ndim> void do_indexSort_subprob_and_OD(cufinufft_plan_t<T> &);
 template<typename T> void do_indexSort_blockgather_3d(cufinufft_plan_t<T> &);
 
 template<typename T, int Ndim>
-void do_interp_nupts_driven(const cufinufft_plan_t<T> &, cuda_complex<T> *,
-                            const cuda_complex<T> *, int);
+void do_interp_nupts_driven(const cufinufft_plan_t<T> &, hip_complex<T> *,
+                            const hip_complex<T> *, int);
 template<typename T, int Ndim>
-void do_interp_subprob(const cufinufft_plan_t<T> &, cuda_complex<T> *,
-                       const cuda_complex<T> *, int);
+void do_interp_subprob(const cufinufft_plan_t<T> &, hip_complex<T> *,
+                       const hip_complex<T> *, int);
 } // namespace spreadinterp
 
 namespace common {
@@ -231,7 +231,7 @@ template<typename T> struct cufinufft_plan_t {
   void setpts(int nj, const T *d_kx, const T *d_ky, const T *d_kz, int nk, const T *d_s,
               const T *d_t, const T *d_u);
   // FIXME: we want to make this "const" in the future
-  void execute(cuda_complex<T> *d_c, cuda_complex<T> *d_fk) const;
+  void execute(hip_complex<T> *d_c, hip_complex<T> *d_fk) const;
 
 private:
   // Worker functions and the POD-copy helper need direct access to private
@@ -241,35 +241,35 @@ private:
 
   template<typename U, int N, int K>
   friend void cufinufft::spreadinterp::spread_nupts_driven_launch(
-      const cufinufft_plan_t<U> &, const cuda_complex<U> *, cuda_complex<U> *, int);
+      const cufinufft_plan_t<U> &, const hip_complex<U> *, hip_complex<U> *, int);
   template<typename U, int N, int K>
   friend void cufinufft::spreadinterp::spread_subprob_launch(
-      const cufinufft_plan_t<U> &, const cuda_complex<U> *, cuda_complex<U> *, int);
+      const cufinufft_plan_t<U> &, const hip_complex<U> *, hip_complex<U> *, int);
   template<typename U, int N, int K>
   friend void cufinufft::spreadinterp::spread_output_driven_launch(
-      const cufinufft_plan_t<U> &, const cuda_complex<U> *, cuda_complex<U> *, int);
+      const cufinufft_plan_t<U> &, const hip_complex<U> *, hip_complex<U> *, int);
   template<typename U, int N, int K>
   friend void cufinufft::spreadinterp::spread_blockgather_3d_launch(
-      const cufinufft_plan_t<U> &, const cuda_complex<U> *, cuda_complex<U> *, int);
+      const cufinufft_plan_t<U> &, const hip_complex<U> *, hip_complex<U> *, int);
   template<typename U, int N, int K>
   friend void cufinufft::spreadinterp::interp_nupts_driven_launch(
-      const cufinufft_plan_t<U> &, cuda_complex<U> *, const cuda_complex<U> *, int);
+      const cufinufft_plan_t<U> &, hip_complex<U> *, const hip_complex<U> *, int);
   template<typename U, int N, int K>
   friend void cufinufft::spreadinterp::interp_subprob_launch(
-      const cufinufft_plan_t<U> &, cuda_complex<U> *, const cuda_complex<U> *, int);
+      const cufinufft_plan_t<U> &, hip_complex<U> *, const hip_complex<U> *, int);
 
   template<typename U, int N>
   friend void cufinufft::spreadinterp::do_spread_nupts_driven(
-      const cufinufft_plan_t<U> &, const cuda_complex<U> *, cuda_complex<U> *, int);
+      const cufinufft_plan_t<U> &, const hip_complex<U> *, hip_complex<U> *, int);
   template<typename U, int N>
   friend void cufinufft::spreadinterp::do_spread_subprob(
-      const cufinufft_plan_t<U> &, const cuda_complex<U> *, cuda_complex<U> *, int);
+      const cufinufft_plan_t<U> &, const hip_complex<U> *, hip_complex<U> *, int);
   template<typename U, int N>
   friend void cufinufft::spreadinterp::do_spread_output_driven(
-      const cufinufft_plan_t<U> &, const cuda_complex<U> *, cuda_complex<U> *, int);
+      const cufinufft_plan_t<U> &, const hip_complex<U> *, hip_complex<U> *, int);
   template<typename U>
   friend void cufinufft::spreadinterp::do_spread_blockgather_3d(
-      const cufinufft_plan_t<U> &, const cuda_complex<U> *, cuda_complex<U> *, int);
+      const cufinufft_plan_t<U> &, const hip_complex<U> *, hip_complex<U> *, int);
 
   template<typename U, int N>
   friend void cufinufft::spreadinterp::do_indexSort_nupts_driven(cufinufft_plan_t<U> &);
@@ -280,10 +280,10 @@ private:
 
   template<typename U, int N>
   friend void cufinufft::spreadinterp::do_interp_nupts_driven(
-      const cufinufft_plan_t<U> &, cuda_complex<U> *, const cuda_complex<U> *, int);
+      const cufinufft_plan_t<U> &, hip_complex<U> *, const hip_complex<U> *, int);
   template<typename U, int N>
   friend void cufinufft::spreadinterp::do_interp_subprob(
-      const cufinufft_plan_t<U> &, cuda_complex<U> *, const cuda_complex<U> *, int);
+      const cufinufft_plan_t<U> &, hip_complex<U> *, const hip_complex<U> *, int);
 
   template<typename U, typename V>
   friend void cufinufft::common::cufinufft_set_shared_memory(V *,
@@ -330,8 +330,8 @@ private:
   // inner type 2 plan for type 3
   std::unique_ptr<cufinufft_plan_t<T>> t2_plan;
 
-  gpu_array<cuda_complex<T>> prephase{0, alloc}; // pre-phase, for all input NU pts
-  gpu_array<cuda_complex<T>> deconv{0, alloc};   // reciprocal of kernel FT, phase, all
+  gpu_array<hip_complex<T>> prephase{0, alloc}; // pre-phase, for all input NU pts
+  gpu_array<hip_complex<T>> deconv{0, alloc};   // reciprocal of kernel FT, phase, all
                                                  // output NU pts
 
   // Arrays that used in subprob method
@@ -356,16 +356,16 @@ private:
   cufft_plan fftplan;
   hipStream_t stream = 0;
 
-  void execute_type1(cuda_complex<T> *d_c, cuda_complex<T> *d_fk) const;
+  void execute_type1(hip_complex<T> *d_c, hip_complex<T> *d_fk) const;
   // The "ntransf_override" parameter is only needed when a type 3 plan calls
   // its inner type 2 plan. Leave at default in all other circumstances!
-  void execute_type2(cuda_complex<T> *d_c, cuda_complex<T> *d_fk,
+  void execute_type2(hip_complex<T> *d_c, hip_complex<T> *d_fk,
                      std::optional<int> ntransf_override = std::optional<int>()) const;
-  void execute_type3(cuda_complex<T> *d_c, cuda_complex<T> *d_fk) const;
+  void execute_type3(hip_complex<T> *d_c, hip_complex<T> *d_fk) const;
 
-  void deconvolve(cuda_complex<T> *fw, cuda_complex<T> *fk, int blksize) const;
+  void deconvolve(hip_complex<T> *fw, hip_complex<T> *fk, int blksize) const;
   template<int modeord, int ndim>
-  void deconvolve_nd(cuda_complex<T> *fw, cuda_complex<T> *fk, int blksize) const;
+  void deconvolve_nd(hip_complex<T> *fw, hip_complex<T> *fk, int blksize) const;
 
   void setpts_type12(int M_, const T *d_kx, const T *d_ky, const T *d_kz);
   void allocate_subprob_state();
@@ -386,8 +386,8 @@ private:
   // block-gather state in setpts(), and that state is consumed by both
   // spreadSorted() and interpSorted().
   void indexSort();
-  void spreadSorted(const cuda_complex<T> *c, cuda_complex<T> *fw, int blksize) const;
-  void interpSorted(cuda_complex<T> *c, const cuda_complex<T> *fw, int blksize) const;
+  void spreadSorted(const hip_complex<T> *c, hip_complex<T> *fw, int blksize) const;
+  void interpSorted(hip_complex<T> *c, const hip_complex<T> *fw, int blksize) const;
 
   // Per-method spread/interp entry points. Worker templates that they
   // dispatch to are defined in per-method per-dim TUs
@@ -424,7 +424,7 @@ private:
     cufinufft::spreadinterp::do_indexSort_blockgather_3d<T>(*this);
   }
 
-  void spread_nupts_driven(const cuda_complex<T> *c, cuda_complex<T> *fw,
+  void spread_nupts_driven(const hip_complex<T> *c, hip_complex<T> *fw,
                            int blksize) const {
     using cufinufft::spreadinterp::do_spread_nupts_driven;
     switch (this->dim) {
@@ -438,7 +438,7 @@ private:
       throw finufft::exception(FINUFFT_ERR_DIM_NOTVALID);
     }
   }
-  void spread_subprob(const cuda_complex<T> *c, cuda_complex<T> *fw, int blksize) const {
+  void spread_subprob(const hip_complex<T> *c, hip_complex<T> *fw, int blksize) const {
     using cufinufft::spreadinterp::do_spread_subprob;
     switch (this->dim) {
     case 1:
@@ -451,7 +451,7 @@ private:
       throw finufft::exception(FINUFFT_ERR_DIM_NOTVALID);
     }
   }
-  void spread_output_driven(const cuda_complex<T> *c, cuda_complex<T> *fw,
+  void spread_output_driven(const hip_complex<T> *c, hip_complex<T> *fw,
                             int blksize) const {
     using cufinufft::spreadinterp::do_spread_output_driven;
     switch (this->dim) {
@@ -465,13 +465,13 @@ private:
       throw finufft::exception(FINUFFT_ERR_DIM_NOTVALID);
     }
   }
-  void spread_blockgather_3d(const cuda_complex<T> *c, cuda_complex<T> *fw,
+  void spread_blockgather_3d(const hip_complex<T> *c, hip_complex<T> *fw,
                              int blksize) const {
     if (this->dim != 3) throw finufft::exception(FINUFFT_ERR_METHOD_NOTVALID);
     cufinufft::spreadinterp::do_spread_blockgather_3d<T>(*this, c, fw, blksize);
   }
 
-  void interp_nupts_driven(cuda_complex<T> *c, const cuda_complex<T> *fw,
+  void interp_nupts_driven(hip_complex<T> *c, const hip_complex<T> *fw,
                            int blksize) const {
     using cufinufft::spreadinterp::do_interp_nupts_driven;
     switch (this->dim) {
@@ -485,7 +485,7 @@ private:
       throw finufft::exception(FINUFFT_ERR_DIM_NOTVALID);
     }
   }
-  void interp_subprob(cuda_complex<T> *c, const cuda_complex<T> *fw, int blksize) const {
+  void interp_subprob(hip_complex<T> *c, const hip_complex<T> *fw, int blksize) const {
     using cufinufft::spreadinterp::do_interp_subprob;
     switch (this->dim) {
     case 1:
@@ -536,8 +536,8 @@ template<typename T> struct cufinufft_gpu_data {
   std::array<const T *, 3> STU = {nullptr, nullptr, nullptr};
   T tol                              = 0;
 
-  const cuda_complex<T> *prephase = nullptr; // pre-phase, for all input NU pts
-  const cuda_complex<T> *deconv   = nullptr; // reciprocal of kernel FT, phase, all
+  const hip_complex<T> *prephase = nullptr; // pre-phase, for all input NU pts
+  const hip_complex<T> *deconv   = nullptr; // reciprocal of kernel FT, phase, all
                                              // output NU pts
 
   // Arrays that used in subprob method

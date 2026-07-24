@@ -58,7 +58,7 @@ using namespace finufft::common;
  */
 template<typename T>
 static __forceinline__ __device__ void atomicAddComplexShared(
-    cuda_complex<T> *address, const cuda_complex<T> &res) {
+    hip_complex<T> *address, const hip_complex<T> &res) {
   const auto raw_address = reinterpret_cast<T *>(address);
   atomicAdd(raw_address, res.x);
   atomicAdd(raw_address + 1, res.y);
@@ -70,8 +70,8 @@ static __forceinline__ __device__ void atomicAddComplexShared(
  * on shared memory are supported so we leverage them
  */
 template<typename T>
-static __forceinline__ __device__ void atomicAddComplexGlobal(cuda_complex<T> *address,
-                                                              cuda_complex<T> res) {
+static __forceinline__ __device__ void atomicAddComplexGlobal(hip_complex<T> *address,
+                                                              hip_complex<T> res) {
   auto raw_address = reinterpret_cast<T *>(address);
   atomicAdd(raw_address, res.x);
   atomicAdd(raw_address + 1, res.y);

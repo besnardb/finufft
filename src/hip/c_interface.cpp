@@ -114,7 +114,7 @@ int cufinufftf_execute(cufinufftf_plan d_plan, hipFloatComplex *d_c,
 }
 
 int cufinufft_execute(cufinufft_plan d_plan, hipDoubleComplex *d_c,
-                      cuda_complex<double> *d_fk) {
+                      hip_complex<double> *d_fk) {
   return safe_finufft_call(
       [&]() { ((cufinufft_plan_t<double> *)d_plan)->execute(d_c, d_fk); });
 }
@@ -190,8 +190,8 @@ using ci64 = const int64_t;
 template<typename T>
 int simple_guru(
     int n_dims, int type, int n_transf, i64 nj, const std::array<const T *, 3> &xyz,
-    cuda_complex<T> *cj, int iflag, T eps, const std::array<ci64, 3> &n_modes, i64 nk,
-    const std::array<const T *, 3> &stu, cuda_complex<T> *fk, const cufinufft_opts *popts)
+    hip_complex<T> *cj, int iflag, T eps, const std::array<ci64, 3> &n_modes, i64 nk,
+    const std::array<const T *, 3> &stu, hip_complex<T> *fk, const cufinufft_opts *popts)
 // Helper layer between simple interfaces and the underlying plan methods.
 // Plan is heap-allocated (it owns CUDA streams / cuFFT plans / device buffers
 // whose destruction order matters) and managed via unique_ptr so error paths
@@ -225,25 +225,25 @@ int simple_guru(
 // thrown finufft::exceptions to C error codes.
 template<typename T>
 int guru13(int n_dims, int type, int n_transf, i64 nj,
-           const std::array<const T *, 3> &xyz, const cuda_complex<T> *cj, int iflag,
+           const std::array<const T *, 3> &xyz, const hip_complex<T> *cj, int iflag,
            T eps, const std::array<ci64, 3> &n_modes, i64 nk,
-           const std::array<const T *, 3> &stu, cuda_complex<T> *fk,
+           const std::array<const T *, 3> &stu, hip_complex<T> *fk,
            const cufinufft_opts *popts) {
   return safe_finufft_call([&]() -> int {
     return simple_guru<T>(n_dims, type, n_transf, nj, xyz,
-                          const_cast<cuda_complex<T> *>(cj), iflag, eps, n_modes, nk, stu,
+                          const_cast<hip_complex<T> *>(cj), iflag, eps, n_modes, nk, stu,
                           fk, popts);
   });
 }
 
 template<typename T>
 int guru2(int n_dims, int type, int n_transf, i64 nj, const std::array<const T *, 3> &xyz,
-          cuda_complex<T> *cj, int iflag, T eps, const std::array<ci64, 3> &n_modes,
-          i64 nk, const std::array<const T *, 3> &stu, const cuda_complex<T> *fk,
+          hip_complex<T> *cj, int iflag, T eps, const std::array<ci64, 3> &n_modes,
+          i64 nk, const std::array<const T *, 3> &stu, const hip_complex<T> *fk,
           const cufinufft_opts *popts) {
   return safe_finufft_call([&]() -> int {
     return simple_guru<T>(n_dims, type, n_transf, nj, xyz, cj, iflag, eps, n_modes, nk,
-                          stu, const_cast<cuda_complex<T> *>(fk), popts);
+                          stu, const_cast<hip_complex<T> *>(fk), popts);
   });
 }
 

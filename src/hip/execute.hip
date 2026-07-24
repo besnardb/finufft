@@ -24,8 +24,8 @@
 // to -1).
 template<typename T, int modeord, int ndim>
 static __global__ void deconv_nd(
-    std::array<int, 3> mstu, std::array<int, 3> nf123, cuda_complex<T> *fw,
-    cuda_complex<T> *fk, std::array<const T *, 3> fwkerhalf, bool fw2fk) {
+    std::array<int, 3> mstu, std::array<int, 3> nf123, hip_complex<T> *fw,
+    hip_complex<T> *fk, std::array<const T *, 3> fwkerhalf, bool fw2fk) {
 
   std::array<int, 3> m_acc{1, mstu[0], mstu[0] * mstu[1]};
   int mtotal = m_acc[ndim - 1] * mstu[ndim - 1];
@@ -67,7 +67,7 @@ static __global__ void deconv_nd(
 template<typename T>
 template<int modeord, int ndim>
 void cufinufft_plan_t<T>::deconvolve_nd(
-    cuda_complex<T> *fw, cuda_complex<T> *fk, int blksize) const
+    hip_complex<T> *fw, hip_complex<T> *fk, int blksize) const
 /*
     wrapper for deconvolution & amplification in 1/2/3D.
 
@@ -83,7 +83,7 @@ void cufinufft_plan_t<T>::deconvolve_nd(
   bool fw2fk = spopts.spread_direction == 1;
   if (!fw2fk)
     checkCudaErrors(
-        hipMemsetAsync(fw, 0, batchsize * nftot * sizeof(cuda_complex<T>), stream));
+        hipMemsetAsync(fw, 0, batchsize * nftot * sizeof(hip_complex<T>), stream));
 
   for (int t = 0; t < blksize; t++)
     deconv_nd<T, modeord, ndim><<<(nmodes + 256 - 1) / 256, 256, 0, stream>>>(
@@ -91,7 +91,7 @@ void cufinufft_plan_t<T>::deconvolve_nd(
 }
 
 template<typename T>
-void cufinufft_plan_t<T>::deconvolve(cuda_complex<T> *fw, cuda_complex<T> *fk,
+void cufinufft_plan_t<T>::deconvolve(hip_complex<T> *fw, hip_complex<T> *fk,
                                      int blksize) const {
   if (dim == 1)
     (opts.modeord == 0) ? deconvolve_nd<0, 1>(fw, fk, blksize)
@@ -105,7 +105,7 @@ void cufinufft_plan_t<T>::deconvolve(cuda_complex<T> *fw, cuda_complex<T> *fk,
 }
 
 template<typename T>
-void cufinufft_plan_t<T>::execute_type1(cuda_complex<T> *d_c, cuda_complex<T> *d_fk) const
+void cufinufft_plan_t<T>::execute_type1(hip_complex<T> *d_c, hip_complex<T> *d_fk) const
 /*
     1D/2D/3D Type-1 NUFFT
 
@@ -125,7 +125,7 @@ void cufinufft_plan_t<T>::execute_type1(cuda_complex<T> *d_c, cuda_complex<T> *d
   for (int idim = 0; idim < dim; ++idim) nmodes *= mstu[idim];
   // We don't need this buffer if we are just spreading; so we set
   // its size to 0 in that case.
-  gpu_array<cuda_complex<T>> fwp(opts.gpu_spreadinterponly ? 0 : nf * batchsize, alloc);
+  gpu_array<hip_complex<T>> fwp(opts.gpu_spreadinterponly ? 0 : nf * batchsize, alloc);
   auto *fw = dethrust(fwp);
   for (int i = 0; i * batchsize < ntransf; i++) {
     int blksize   = std::min(ntransf - i * batchsize, batchsize);
@@ -137,7 +137,7 @@ void cufinufft_plan_t<T>::execute_type1(cuda_complex<T> *d_c, cuda_complex<T> *d
                                                    // section of the user output f
 
     checkCudaErrors(
-        hipMemsetAsync(fw, 0, blksize * nf * sizeof(cuda_complex<T>), stream));
+        hipMemsetAsync(fw, 0, blksize * nf * sizeof(hip_complex<T>), stream));
 
     // Step 1: Spread
     spreadSorted(c, fw, blksize);
@@ -155,7 +155,7 @@ void cufinufft_plan_t<T>::execute_type1(cuda_complex<T> *d_c, cuda_complex<T> *d
 }
 
 template<typename T>
-void cufinufft_plan_t<T>::execute_type2(cuda_complex<T> *d_c, cuda_complex<T> *d_fk,
+void cufinufft_plan_t<T>::execute_type2(hip_complex<T> *d_c, hip_complex<T> *d_fk,
                                         std::optional<int> ntransf_override) const
 /*
     1D/2D/3D Type-2 NUFFT
@@ -180,7 +180,7 @@ void cufinufft_plan_t<T>::execute_type2(cuda_complex<T> *d_c, cuda_complex<T> *d
   for (int idim = 0; idim < dim; ++idim) nmodes *= mstu[idim];
   // We don't need this buffer if we are just interpolating; so we set
   // its size to 0 in that case.
-  gpu_array<cuda_complex<T>> fwp(opts.gpu_spreadinterponly ? 0 : nf * batchsize, alloc);
+  gpu_array<hip_complex<T>> fwp(opts.gpu_spreadinterponly ? 0 : nf * batchsize, alloc);
   auto *fw = dethrust(fwp);
   for (int i = 0; i * batchsize < ntransf_for_this_run; i++) {
     int blksize = std::min(ntransf_for_this_run - i * batchsize, batchsize);
@@ -207,8 +207,8 @@ void cufinufft_plan_t<T>::execute_type2(cuda_complex<T> *d_c, cuda_complex<T> *d
 
 // TODO: in case data is centered, we could save GPU memory
 template<typename T>
-void cufinufft_plan_t<T>::execute_type3(cuda_complex<T> *d_c,
-                                        cuda_complex<T> *d_fk) const {
+void cufinufft_plan_t<T>::execute_type3(hip_complex<T> *d_c,
+                                        hip_complex<T> *d_fk) const {
   /*
     1D/2D/3D Type-3 NUFFT
 
@@ -221,25 +221,25 @@ void cufinufft_plan_t<T>::execute_type3(cuda_complex<T> *d_c,
 
   Marco Barbone 08/14/2024
   */
-  gpu_array<cuda_complex<T>> CpBatch(M * batchsize, alloc);
-  gpu_array<cuda_complex<T>> fwp(nf * batchsize, alloc);
+  gpu_array<hip_complex<T>> CpBatch(M * batchsize, alloc);
+  gpu_array<hip_complex<T>> fwp(nf * batchsize, alloc);
   auto *fw = dethrust(fwp);
   for (int i = 0; i * batchsize < ntransf; i++) {
     int blksize                = std::min(ntransf - i * batchsize, batchsize);
-    cuda_complex<T> *d_cstart  = d_c + i * batchsize * M;
-    cuda_complex<T> *d_fkstart = d_fk + i * batchsize * N;
+    hip_complex<T> *d_cstart  = d_c + i * batchsize * M;
+    hip_complex<T> *d_fkstart = d_fk + i * batchsize * N;
     // setting input for spreader
     auto *c = dethrust(CpBatch);
     // setting output for spreader
     auto *fk = fw;
     // NOTE: fw might need to be set to 0
     checkCudaErrors(
-        hipMemsetAsync(fw, 0, blksize * nf * sizeof(cuda_complex<T>), stream));
+        hipMemsetAsync(fw, 0, blksize * nf * sizeof(hip_complex<T>), stream));
     // Step 0: pre-phase the input strengths
     for (int block = 0; block < blksize; block++) {
       thrust::transform(thrust::cuda::par.on(stream), dethrust(prephase),
                         dethrust(prephase) + M, d_cstart + block * M, c + block * M,
-                        thrust::multiplies<cuda_complex<T>>());
+                        thrust::multiplies<hip_complex<T>>());
     }
     // Step 1: Spread
     spreadSorted(c, fk, blksize);
@@ -254,13 +254,13 @@ void cufinufft_plan_t<T>::execute_type3(cuda_complex<T> *d_c,
     for (int j = 0; j < blksize; j++) {
       thrust::transform(thrust::cuda::par.on(stream), dethrust(deconv),
                         dethrust(deconv) + N, d_fkstart + j * N, d_fkstart + j * N,
-                        thrust::multiplies<cuda_complex<T>>());
+                        thrust::multiplies<hip_complex<T>>());
     }
   }
 }
 
 template<typename T>
-void cufinufft_plan_t<T>::execute(cuda_complex<T> *d_c, cuda_complex<T> *d_fk) const {
+void cufinufft_plan_t<T>::execute(hip_complex<T> *d_c, hip_complex<T> *d_fk) const {
   DeviceSwitcher switcher(opts.gpu_device_id);
   switch (type) {
   case 1:
@@ -271,7 +271,7 @@ void cufinufft_plan_t<T>::execute(cuda_complex<T> *d_c, cuda_complex<T> *d_fk) c
     return execute_type3(d_c, d_fk);
   }
 }
-template void cufinufft_plan_t<float>::execute(cuda_complex<float> *d_c,
-                                               cuda_complex<float> *d_fk) const;
-template void cufinufft_plan_t<double>::execute(cuda_complex<double> *d_c,
-                                                cuda_complex<double> *d_fk) const;
+template void cufinufft_plan_t<float>::execute(hip_complex<float> *d_c,
+                                               hip_complex<float> *d_fk) const;
+template void cufinufft_plan_t<double>::execute(hip_complex<double> *d_c,
+                                                hip_complex<double> *d_fk) const;

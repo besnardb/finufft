@@ -17,9 +17,9 @@ namespace spreadinterp {
 // Subprob spreading kernel
 template<typename T, int KEREVALMETH, int ndim, int ns>
 __global__ FINUFFT_FLATTEN void spread_subprob(
-    cufinufft_gpu_data<T> p, const cuda_complex<T> *c, cuda_complex<T> *fw) {
+    cufinufft_gpu_data<T> p, const hip_complex<T> *c, hip_complex<T> *fw) {
   extern __shared__ char sharedbuf[];
-  auto fwshared = (cuda_complex<T> *)sharedbuf;
+  auto fwshared = (hip_complex<T> *)sharedbuf;
 
   T sigma   = p.sigma;
   T es_c    = p.es_c;
@@ -99,8 +99,8 @@ __global__ FINUFFT_FLATTEN void spread_subprob(
 
 // Subprob spreading CPU driver
 template<typename T, int ndim, int ns>
-void spread_subprob_launch(const cufinufft_plan_t<T> &d_plan, const cuda_complex<T> *c,
-                           cuda_complex<T> *fw, int blksize) {
+void spread_subprob_launch(const cufinufft_plan_t<T> &d_plan, const hip_complex<T> *c,
+                           hip_complex<T> *fw, int blksize) {
   const auto sharedplanorysize = d_plan.shared_memory_required();
 
   const auto launch = [&](auto kernel) {
@@ -116,8 +116,8 @@ void spread_subprob_launch(const cufinufft_plan_t<T> &d_plan, const cuda_complex
 
 template<typename T, int Ndim> struct SpreadSubprobCaller {
   const cufinufft_plan_t<T> &p;
-  const cuda_complex<T> *c;
-  cuda_complex<T> *fw;
+  const hip_complex<T> *c;
+  hip_complex<T> *fw;
   int blksize;
   template<int Ns> void operator()() const {
     spread_subprob_launch<T, Ndim, Ns>(p, c, fw, blksize);
@@ -125,8 +125,8 @@ template<typename T, int Ndim> struct SpreadSubprobCaller {
 };
 
 template<typename T, int Ndim>
-void do_spread_subprob(const cufinufft_plan_t<T> &p, const cuda_complex<T> *c,
-                       cuda_complex<T> *fw, int blksize) {
+void do_spread_subprob(const cufinufft_plan_t<T> &p, const hip_complex<T> *c,
+                       hip_complex<T> *fw, int blksize) {
   using namespace finufft::common;
   SpreadSubprobCaller<T, Ndim> caller{p, c, fw, blksize};
   using NsSeq = poet::inclusive_range<MIN_NSPREAD, MAX_NSPREAD<T>>;
@@ -181,11 +181,11 @@ template<typename T, int Ndim> void do_indexSort_subprob_and_OD(cufinufft_plan_t
 }
 
 template void do_spread_subprob<float, CUFINUFFT_DIM>(const cufinufft_plan_t<float> &,
-                                                      const cuda_complex<float> *,
-                                                      cuda_complex<float> *, int);
+                                                      const hip_complex<float> *,
+                                                      hip_complex<float> *, int);
 template void do_spread_subprob<double, CUFINUFFT_DIM>(const cufinufft_plan_t<double> &,
-                                                       const cuda_complex<double> *,
-                                                       cuda_complex<double> *, int);
+                                                       const hip_complex<double> *,
+                                                       hip_complex<double> *, int);
 
 template void do_indexSort_subprob_and_OD<float, CUFINUFFT_DIM>(
     cufinufft_plan_t<float> &);

@@ -24,7 +24,7 @@ using std::max;
 template<typename T> std::size_t shared_memory_per_point(int dim, int ns) {
   return ns * sizeof(T) * dim       // kernel evaluations
          + sizeof(int) * dim        // indexes
-         + sizeof(cuda_complex<T>); // strength
+         + sizeof(hip_complex<T>); // strength
 }
 template std::size_t shared_memory_per_point<float>(int dim, int ns);
 template std::size_t shared_memory_per_point<double>(int dim, int ns);
@@ -38,7 +38,7 @@ std::size_t shared_memory_required(int dim, int ns, int bin_size_x, int bin_size
   std::size_t grid_size      = bin_size_x + 2 * ns_2;
   if (dim > 1) grid_size *= bin_size_y + 2 * ns_2;
   if (dim > 2) grid_size *= bin_size_z + 2 * ns_2;
-  return grid_size * sizeof(cuda_complex<T>) + shmem_per_point * np;
+  return grid_size * sizeof(hip_complex<T>) + shmem_per_point * np;
 }
 template std::size_t shared_memory_required<float>(
     int dim, int ns, int bin_size_x, int bin_size_y, int bin_size_z, int np);
@@ -48,7 +48,7 @@ template std::size_t shared_memory_required<double>(
 // Function to find bin_size_x == bin_size_y
 // where bin_size_x * bin_size_y * bin_size_z < mem_size
 template<typename T> int find_bin_size(std::size_t mem_size, int dim, int ns) {
-  const auto elements        = mem_size / sizeof(cuda_complex<T>);
+  const auto elements        = mem_size / sizeof(hip_complex<T>);
   const auto padded_bin_size = int(std::floor(std::pow(elements, 1.0 / dim)));
   const auto bin_size        = padded_bin_size - (2 * (ns + 1) / 2);
   // TODO: over one dimension we could increase this a bit
@@ -232,7 +232,7 @@ inline int ns_bucket(int ns) {
 template<typename T>
 Method3Config get_method3_config(Method3Category category, int dim, int ns,
                                  int shmem_limit_bytes, int shmem_per_point_bytes) {
-  const int complex_bytes = sizeof(cuda_complex<T>);
+  const int complex_bytes = sizeof(hip_complex<T>);
   // For unknown GPUs: compute bins dynamically based on available SMEM
   if (category == Method3Category::UNKNOWN) {
     // Iteratively find (bin, np) satisfying: bin >= 8, np >= 16

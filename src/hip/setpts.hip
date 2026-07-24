@@ -188,7 +188,7 @@ void cufinufft_plan_t<T>::setpts(int nj, const T *d_kx, const T *d_ky, const T *
     thrust::transform(
         thrust::cuda::par.on(stream), iterator, iterator + M, dethrust(prephase),
         [D, realsign] __host__
-        __device__(const thrust::tuple<T, T, T> &tuple) -> cuda_complex<T> {
+        __device__(const thrust::tuple<T, T, T> &tuple) -> hip_complex<T> {
           const auto x = thrust::get<0>(tuple);
           const auto y = thrust::get<1>(tuple);
           const auto z = thrust::get<2>(tuple);
@@ -198,11 +198,11 @@ void cufinufft_plan_t<T>::setpts(int nj, const T *d_kx, const T *d_ky, const T *
           // TODO: nvcc should have the sincos function
           //       check the cos + i*sin
           //       ref: https://en.wikipedia.org/wiki/Cis_(mathematics)
-          return cuda_complex<T>{std::cos(phase), std::sin(phase) * realsign};
+          return hip_complex<T>{std::cos(phase), std::sin(phase) * realsign};
         });
   } else {
     thrust::fill(thrust::cuda::par.on(stream), dethrust(prephase), dethrust(prephase) + M,
-                 cuda_complex<T>{1, 0});
+                 hip_complex<T>{1, 0});
   }
 
   for (int idim = 0; idim < dim; ++idim) {
@@ -250,7 +250,7 @@ void cufinufft_plan_t<T>::setpts(int nj, const T *d_kx, const T *d_ky, const T *
     thrust::transform(thrust::cuda::par.on(stream), phi_hat_iterator,
                       phi_hat_iterator + N, dethrust(deconv),
                       [xdim] __host__
-                      __device__(const thrust::tuple<T, T, T> tuple) -> cuda_complex<T> {
+                      __device__(const thrust::tuple<T, T, T> tuple) -> hip_complex<T> {
                         auto phiHat = thrust::get<0>(tuple);
                         // in case dim < 2 or dim < 3, multiply by 1
                         phiHat *= (xdim > 1) ? thrust::get<1>(tuple) : T(1);
@@ -275,12 +275,12 @@ void cufinufft_plan_t<T>::setpts(int nj, const T *d_kx, const T *d_ky, const T *
           dethrust(deconv), dethrust(deconv),
           [c1, c2, c3, d1, d2, d3, realsign] __host__
           __device__(const thrust::tuple<T, T, T> tuple,
-                     cuda_complex<T> deconv) -> cuda_complex<T> {
+                     hip_complex<T> deconv) -> hip_complex<T> {
             // d2 and d3 are 0 if dim < 2 and dim < 3
             const auto phase = c1 * (thrust::get<0>(tuple) + d1) +
                                c2 * (thrust::get<1>(tuple) + d2) +
                                c3 * (thrust::get<2>(tuple) + d3);
-            return cuda_complex<T>{std::cos(phase), realsign * std::sin(phase)} * deconv;
+            return hip_complex<T>{std::cos(phase), realsign * std::sin(phase)} * deconv;
           });
     }
     // exiting the block frees the memory allocated for phi_hat1, phi_hat2, and phi_hat3

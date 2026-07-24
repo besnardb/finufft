@@ -32,7 +32,7 @@ template<typename T> void cufinufft_plan_t<T>::indexSort() {
 }
 
 template<typename T>
-void cufinufft_plan_t<T>::spreadSorted(const cuda_complex<T> *c, cuda_complex<T> *fw,
+void cufinufft_plan_t<T>::spreadSorted(const hip_complex<T> *c, hip_complex<T> *fw,
                                        int blksize) const {
   switch (opts.gpu_method) {
   case 1:
@@ -50,7 +50,7 @@ void cufinufft_plan_t<T>::spreadSorted(const cuda_complex<T> *c, cuda_complex<T>
 }
 
 template<typename T>
-void cufinufft_plan_t<T>::interpSorted(cuda_complex<T> *c, const cuda_complex<T> *fw,
+void cufinufft_plan_t<T>::interpSorted(hip_complex<T> *c, const hip_complex<T> *fw,
                                        int blksize) const {
   switch (opts.gpu_method) {
   case 1:
@@ -65,11 +65,11 @@ void cufinufft_plan_t<T>::interpSorted(cuda_complex<T> *c, const cuda_complex<T>
 
 template void cufinufft_plan_t<float>::indexSort();
 template void cufinufft_plan_t<double>::indexSort();
-template void cufinufft_plan_t<float>::spreadSorted(const cuda_complex<float> *,
-                                                    cuda_complex<float> *, int) const;
-template void cufinufft_plan_t<double>::spreadSorted(const cuda_complex<double> *,
-                                                     cuda_complex<double> *, int) const;
+template void cufinufft_plan_t<float>::spreadSorted(const hip_complex<float> *,
+                                                    hip_complex<float> *, int) const;
+template void cufinufft_plan_t<double>::spreadSorted(const hip_complex<double> *,
+                                                     hip_complex<double> *, int) const;
 template void cufinufft_plan_t<float>::interpSorted(
-    cuda_complex<float> *, const cuda_complex<float> *, int) const;
+    hip_complex<float> *, const hip_complex<float> *, int) const;
 template void cufinufft_plan_t<double>::interpSorted(
-    cuda_complex<double> *, const cuda_complex<double> *, int) const;
+    hip_complex<double> *, const hip_complex<double> *, int) const;

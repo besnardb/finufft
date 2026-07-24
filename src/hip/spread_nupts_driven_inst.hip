@@ -17,7 +17,7 @@ namespace spreadinterp {
 // Nupts-driven spreading kernel
 template<typename T, int KEREVALMETH, int ndim, int ns>
 __global__ FINUFFT_FLATTEN void spread_nupts_driven(
-    cufinufft_gpu_data<T> p, const cuda_complex<T> *c, cuda_complex<T> *fw) {
+    cufinufft_gpu_data<T> p, const hip_complex<T> *c, hip_complex<T> *fw) {
 
   T sigma   = p.sigma;
   T es_c    = p.es_c;
@@ -38,7 +38,7 @@ __global__ FINUFFT_FLATTEN void spread_nupts_driven(
       for (int y0 = 0, iy = start[1]; y0 < ns;
            ++y0, iy       = (iy + 1 >= p.nf123[1]) ? 0 : iy + 1) {
         const auto outidx0   = iy * p.nf123[0];
-        cuda_complex<T> valy = val * ker[1][y0];
+        hip_complex<T> valy = val * ker[1][y0];
         for (int x0 = 0, ix = start[0]; x0 < ns;
              ++x0, ix       = (ix + 1 >= p.nf123[0]) ? 0 : ix + 1)
           atomicAddComplexGlobal<T>(fw + outidx0 + ix, ker[0][x0] * valy);
@@ -47,11 +47,11 @@ __global__ FINUFFT_FLATTEN void spread_nupts_driven(
       for (int z0 = 0, iz = start[2]; z0 < ns;
            ++z0, iz       = (iz + 1 >= p.nf123[2]) ? 0 : iz + 1) {
         const auto outidx0   = iz * p.nf123[1] * p.nf123[0];
-        cuda_complex<T> valz = val * ker[2][z0];
+        hip_complex<T> valz = val * ker[2][z0];
         for (int y0 = 0, iy = start[1]; y0 < ns;
              ++y0, iy       = (iy + 1 >= p.nf123[1]) ? 0 : iy + 1) {
           const auto outidx1   = outidx0 + iy * p.nf123[0];
-          cuda_complex<T> valy = valz * ker[1][y0];
+          hip_complex<T> valy = valz * ker[1][y0];
           for (int x0 = 0, ix = start[0]; x0 < ns;
                ++x0, ix       = (ix + 1 >= p.nf123[0]) ? 0 : ix + 1) {
             atomicAddComplexGlobal<T>(fw + outidx1 + ix, ker[0][x0] * valy);
@@ -65,7 +65,7 @@ __global__ FINUFFT_FLATTEN void spread_nupts_driven(
 // Nupts-driven spreading CPU driver
 template<typename T, int ndim, int ns>
 void spread_nupts_driven_launch(const cufinufft_plan_t<T> &d_plan,
-                                const cuda_complex<T> *c, cuda_complex<T> *fw,
+                                const hip_complex<T> *c, hip_complex<T> *fw,
                                 int blksize) {
   const dim3 threadsPerBlock{16, 1, 1};
   const dim3 blocks{(unsigned(d_plan.M) + 15) / 16, 1, 1};
@@ -83,8 +83,8 @@ void spread_nupts_driven_launch(const cufinufft_plan_t<T> &d_plan,
 
 template<typename T, int Ndim> struct SpreadNuptsDrivenCaller {
   const cufinufft_plan_t<T> &p;
-  const cuda_complex<T> *c;
-  cuda_complex<T> *fw;
+  const hip_complex<T> *c;
+  hip_complex<T> *fw;
   int blksize;
   template<int Ns> void operator()() const {
     spread_nupts_driven_launch<T, Ndim, Ns>(p, c, fw, blksize);
@@ -92,8 +92,8 @@ template<typename T, int Ndim> struct SpreadNuptsDrivenCaller {
 };
 
 template<typename T, int Ndim>
-void do_spread_nupts_driven(const cufinufft_plan_t<T> &p, const cuda_complex<T> *c,
-                            cuda_complex<T> *fw, int blksize) {
+void do_spread_nupts_driven(const cufinufft_plan_t<T> &p, const hip_complex<T> *c,
+                            hip_complex<T> *fw, int blksize) {
   using namespace finufft::common;
   SpreadNuptsDrivenCaller<T, Ndim> caller{p, c, fw, blksize};
   using NsSeq = poet::inclusive_range<MIN_NSPREAD, MAX_NSPREAD<T>>;
@@ -131,11 +131,11 @@ template<typename T, int Ndim> void do_indexSort_nupts_driven(cufinufft_plan_t<T
 }
 
 template void do_spread_nupts_driven<float, CUFINUFFT_DIM>(
-    const cufinufft_plan_t<float> &, const cuda_complex<float> *, cuda_complex<float> *,
+    const cufinufft_plan_t<float> &, const hip_complex<float> *, hip_complex<float> *,
     int);
 template void do_spread_nupts_driven<double, CUFINUFFT_DIM>(
-    const cufinufft_plan_t<double> &, const cuda_complex<double> *,
-    cuda_complex<double> *, int);
+    const cufinufft_plan_t<double> &, const hip_complex<double> *,
+    hip_complex<double> *, int);
 
 template void do_indexSort_nupts_driven<float, CUFINUFFT_DIM>(cufinufft_plan_t<float> &);
 template void do_indexSort_nupts_driven<double, CUFINUFFT_DIM>(

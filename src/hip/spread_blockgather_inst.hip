@@ -167,8 +167,8 @@ __global__ void calc_inverse_of_global_sort_index_ghost(
 }
 
 template<typename T, int KEREVALMETH, int ndim, int ns>
-__global__ void spread_3d_block_gather(cufinufft_gpu_data<T> p, const cuda_complex<T> *c,
-                                       cuda_complex<T> *fw) {
+__global__ void spread_3d_block_gather(cufinufft_gpu_data<T> p, const hip_complex<T> *c,
+                                       hip_complex<T> *fw) {
   static_assert(ndim == 3, "unsupported dimensionality");
 
   T es_c             = p.es_c;
@@ -192,7 +192,7 @@ __global__ void spread_3d_block_gather(cufinufft_gpu_data<T> p, const cuda_compl
   }
 
   extern __shared__ char sharedbuf[];
-  cuda_complex<T> *fwshared = (cuda_complex<T> *)sharedbuf;
+  hip_complex<T> *fwshared = (hip_complex<T> *)sharedbuf;
   const int subpidx         = blockIdx.x;
   const int obidx           = p.subprob_to_bin[subpidx];
   const int bidx            = obidx * binsperobin_tot;
@@ -279,11 +279,11 @@ __global__ void spread_3d_block_gather(cufinufft_gpu_data<T> p, const cuda_compl
 
 template<typename T, int ndim, int ns>
 void spread_blockgather_3d_launch(const cufinufft_plan_t<T> &d_plan,
-                                  const cuda_complex<T> *c, cuda_complex<T> *fw,
+                                  const hip_complex<T> *c, hip_complex<T> *fw,
                                   int blksize) {
   if constexpr (ndim == 3) {
     size_t sharedplanorysize = d_plan.opts.gpu_obinsizex * d_plan.opts.gpu_obinsizey *
-                               d_plan.opts.gpu_obinsizez * sizeof(cuda_complex<T>);
+                               d_plan.opts.gpu_obinsizez * sizeof(hip_complex<T>);
     if (sharedplanorysize > 49152) {
       std::cerr << "[spread_blockgather_3d_launch] error: not enough shared memory"
                 << std::endl;
@@ -306,8 +306,8 @@ void spread_blockgather_3d_launch(const cufinufft_plan_t<T> &d_plan,
 
 template<typename T> struct SpreadBlockGatherCaller {
   const cufinufft_plan_t<T> &p;
-  const cuda_complex<T> *c;
-  cuda_complex<T> *fw;
+  const hip_complex<T> *c;
+  hip_complex<T> *fw;
   int blksize;
   template<int Ns> void operator()() const {
     spread_blockgather_3d_launch<T, 3, Ns>(p, c, fw, blksize);
@@ -315,8 +315,8 @@ template<typename T> struct SpreadBlockGatherCaller {
 };
 
 template<typename T>
-void do_spread_blockgather_3d(const cufinufft_plan_t<T> &p, const cuda_complex<T> *c,
-                              cuda_complex<T> *fw, int blksize) {
+void do_spread_blockgather_3d(const cufinufft_plan_t<T> &p, const hip_complex<T> *c,
+                              hip_complex<T> *fw, int blksize) {
   using namespace finufft::common;
   SpreadBlockGatherCaller<T> caller{p, c, fw, blksize};
   using NsSeq = poet::inclusive_range<MIN_NSPREAD, MAX_NSPREAD<T>>;
@@ -446,11 +446,11 @@ template<typename T> void do_indexSort_blockgather_3d(cufinufft_plan_t<T> &p) {
 }
 
 template void do_spread_blockgather_3d<float>(const cufinufft_plan_t<float> &,
-                                              const cuda_complex<float> *,
-                                              cuda_complex<float> *, int);
+                                              const hip_complex<float> *,
+                                              hip_complex<float> *, int);
 template void do_spread_blockgather_3d<double>(const cufinufft_plan_t<double> &,
-                                               const cuda_complex<double> *,
-                                               cuda_complex<double> *, int);
+                                               const hip_complex<double> *,
+                                               hip_complex<double> *, int);
 
 template void do_indexSort_blockgather_3d<float>(cufinufft_plan_t<float> &);
 template void do_indexSort_blockgather_3d<double>(cufinufft_plan_t<double> &);
