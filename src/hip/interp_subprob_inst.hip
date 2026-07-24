@@ -17,9 +17,9 @@ namespace spreadinterp {
 // Subprob interpolation kernel
 template<typename T, int KEREVALMETH, int ndim, int ns>
 __global__ FINUFFT_FLATTEN void interp_subprob(
-    cufinufft_gpu_data<T> p, hipComplex<T> *c, const hipComplex<T> *fw) {
+    cufinufft_gpu_data<T> p, cuda_complex<T> *c, const cuda_complex<T> *fw) {
   extern __shared__ char sharedbuf[];
-  auto fwshared = (hipComplex<T> *)sharedbuf;
+  auto fwshared = (cuda_complex<T> *)sharedbuf;
 
   T sigma   = p.sigma;
   T es_c    = p.es_c;
@@ -47,7 +47,7 @@ __global__ FINUFFT_FLATTEN void interp_subprob(
     auto [ker, start]   = get_kerval_and_local_start<T, KEREVALMETH, ndim, ns>(
         nuptsidx, p.xyz, p.nf123, offset, sigma, es_c, es_beta);
 
-    hipComplex<T> cnow{0, 0};
+    cuda_complex<T> cnow{0, 0};
     if constexpr (ndim == 1) {
       const auto ofs0 = start[0] + ns_2;
       for (int xx = 0; xx < ns; ++xx) cnow += fwshared[ofs0 + xx] * ker[0][xx];
@@ -56,7 +56,7 @@ __global__ FINUFFT_FLATTEN void interp_subprob(
       const auto delta_y = binsizes[0] + rounded_ns;
       const auto ofs0    = (start[1] + ns_2) * delta_y + (start[0] + ns_2);
       for (int yy = 0; yy < ns; ++yy) {
-        hipComplex<T> cnowy{0, 0};
+        cuda_complex<T> cnowy{0, 0};
         const auto ofs = ofs0 + yy * delta_y;
         for (int xx = 0; xx < ns; ++xx) {
           cnowy += fwshared[ofs + xx] * ker[0][xx];
@@ -70,10 +70,10 @@ __global__ FINUFFT_FLATTEN void interp_subprob(
       const auto ofs0 =
           (start[2] + ns_2) * delta_z + (start[1] + ns_2) * delta_y + (start[0] + ns_2);
       for (int zz = 0; zz < ns; ++zz) {
-        hipComplex<T> cnowz{0, 0};
+        cuda_complex<T> cnowz{0, 0};
         const auto ofs1 = ofs0 + zz * delta_z;
         for (int yy = 0; yy < ns; ++yy) {
-          hipComplex<T> cnowy{0, 0};
+          cuda_complex<T> cnowy{0, 0};
           const auto ofs = ofs1 + yy * delta_y;
           for (int xx = 0; xx < ns; ++xx) {
             cnowy += fwshared[ofs + xx] * ker[0][xx];
@@ -89,8 +89,8 @@ __global__ FINUFFT_FLATTEN void interp_subprob(
 
 // Subprob interpolation CPU driver
 template<typename T, int ndim, int ns>
-void interp_subprob_launch(const cufinufft_plan_t<T> &d_plan, hipComplex<T> *c,
-                           const hipComplex<T> *fw, int blksize) {
+void interp_subprob_launch(const cufinufft_plan_t<T> &d_plan, cuda_complex<T> *c,
+                           const cuda_complex<T> *fw, int blksize) {
   const auto sharedplanorysize = d_plan.shared_memory_required();
 
   const auto launch = [&](auto kernel) {
@@ -107,8 +107,8 @@ void interp_subprob_launch(const cufinufft_plan_t<T> &d_plan, hipComplex<T> *c,
 
 template<typename T, int Ndim> struct InterpSubprobCaller {
   const cufinufft_plan_t<T> &p;
-  hipComplex<T> *c;
-  const hipComplex<T> *fw;
+  cuda_complex<T> *c;
+  const cuda_complex<T> *fw;
   int blksize;
   template<int Ns> void operator()() const {
     interp_subprob_launch<T, Ndim, Ns>(p, c, fw, blksize);
@@ -116,8 +116,8 @@ template<typename T, int Ndim> struct InterpSubprobCaller {
 };
 
 template<typename T, int Ndim>
-void do_interp_subprob(const cufinufft_plan_t<T> &p, hipComplex<T> *c,
-                       const hipComplex<T> *fw, int blksize) {
+void do_interp_subprob(const cufinufft_plan_t<T> &p, cuda_complex<T> *c,
+                       const cuda_complex<T> *fw, int blksize) {
   using namespace finufft::common;
   InterpSubprobCaller<T, Ndim> caller{p, c, fw, blksize};
   using NsSeq = poet::inclusive_range<MIN_NSPREAD, MAX_NSPREAD<T>>;
@@ -125,11 +125,11 @@ void do_interp_subprob(const cufinufft_plan_t<T> &p, hipComplex<T> *c,
 }
 
 template void do_interp_subprob<float, CUFINUFFT_DIM>(const cufinufft_plan_t<float> &,
-                                                      hipComplex<float> *,
-                                                      const hipComplex<float> *, int);
+                                                      cuda_complex<float> *,
+                                                      const cuda_complex<float> *, int);
 template void do_interp_subprob<double, CUFINUFFT_DIM>(const cufinufft_plan_t<double> &,
-                                                       hipComplex<double> *,
-                                                       const hipComplex<double> *, int);
+                                                       cuda_complex<double> *,
+                                                       const cuda_complex<double> *, int);
 
 } // namespace spreadinterp
 } // namespace cufinufft

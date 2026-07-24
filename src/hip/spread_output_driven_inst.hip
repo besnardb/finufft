@@ -17,7 +17,7 @@ namespace spreadinterp {
 // Output-driven spreading kernel
 template<typename T, int KEREVALMETH, int ndim, int ns>
 __global__ FINUFFT_FLATTEN void spread_output_driven(
-    cufinufft_gpu_data<T> p, const hipComplex<T> *c, hipComplex<T> *fw, int np) {
+    cufinufft_gpu_data<T> p, const cuda_complex<T> *c, cuda_complex<T> *fw, int np) {
   extern __shared__ char sharedbuf[];
 
   T sigma   = p.sigma;
@@ -39,17 +39,17 @@ __global__ FINUFFT_FLATTEN void spread_output_driven(
 
   auto [padded_size, local_subgrid_size] = get_padded_subgrid_info<ndim, ns>(binsizes);
 
-  using kernel_data = hip::std::array<hip::std::array<T, ns>, ndim>;
+  using kernel_data = std::array<std::array<T, ns>, ndim>;
   auto *kerevals    = reinterpret_cast<kernel_data *>(sharedbuf);
   // Offset pointer into sharedbuf after kerevals
   auto *nupts_sm =
-      reinterpret_cast<hipComplex<T> *>(sharedbuf + np * sizeof(kernel_data));
-  auto *shift = reinterpret_cast<hip::std::array<int, ndim> *>(
-      sharedbuf + np * sizeof(kernel_data) + np * sizeof(hipComplex<T>));
+      reinterpret_cast<cuda_complex<T> *>(sharedbuf + np * sizeof(kernel_data));
+  auto *shift = reinterpret_cast<std::array<int, ndim> *>(
+      sharedbuf + np * sizeof(kernel_data) + np * sizeof(cuda_complex<T>));
 
-  auto *local_subgrid = reinterpret_cast<hipComplex<T> *>(
-      sharedbuf + np * sizeof(kernel_data) + np * sizeof(hipComplex<T>) +
-      np * sizeof(hip::std::array<int, ndim>));
+  auto *local_subgrid = reinterpret_cast<cuda_complex<T> *>(
+      sharedbuf + np * sizeof(kernel_data) + np * sizeof(cuda_complex<T>) +
+      np * sizeof(std::array<int, ndim>));
 
   // set local_subgrid to zero
   for (int i = threadIdx.x; i < local_subgrid_size; i += blockDim.x) {
@@ -107,7 +107,7 @@ __global__ FINUFFT_FLATTEN void spread_output_driven(
 // Output-driven spreading CPU driver
 template<typename T, int ndim, int ns>
 void spread_output_driven_launch(const cufinufft_plan_t<T> &d_plan,
-                                 const hipComplex<T> *c, hipComplex<T> *fw,
+                                 const cuda_complex<T> *c, cuda_complex<T> *fw,
                                  int blksize) {
   int bufsz = 1;
   for (int idim = 0; idim < ndim; ++idim) bufsz *= ns;
@@ -132,8 +132,8 @@ void spread_output_driven_launch(const cufinufft_plan_t<T> &d_plan,
 
 template<typename T, int Ndim> struct SpreadOutputDrivenCaller {
   const cufinufft_plan_t<T> &p;
-  const hipComplex<T> *c;
-  hipComplex<T> *fw;
+  const cuda_complex<T> *c;
+  cuda_complex<T> *fw;
   int blksize;
   template<int Ns> void operator()() const {
     spread_output_driven_launch<T, Ndim, Ns>(p, c, fw, blksize);
@@ -141,8 +141,8 @@ template<typename T, int Ndim> struct SpreadOutputDrivenCaller {
 };
 
 template<typename T, int Ndim>
-void do_spread_output_driven(const cufinufft_plan_t<T> &p, const hipComplex<T> *c,
-                             hipComplex<T> *fw, int blksize) {
+void do_spread_output_driven(const cufinufft_plan_t<T> &p, const cuda_complex<T> *c,
+                             cuda_complex<T> *fw, int blksize) {
   using namespace finufft::common;
   SpreadOutputDrivenCaller<T, Ndim> caller{p, c, fw, blksize};
   using NsSeq = poet::inclusive_range<MIN_NSPREAD, MAX_NSPREAD<T>>;
@@ -150,11 +150,11 @@ void do_spread_output_driven(const cufinufft_plan_t<T> &p, const hipComplex<T> *
 }
 
 template void do_spread_output_driven<float, CUFINUFFT_DIM>(
-    const cufinufft_plan_t<float> &, const hipComplex<float> *, hipComplex<float> *,
+    const cufinufft_plan_t<float> &, const cuda_complex<float> *, cuda_complex<float> *,
     int);
 template void do_spread_output_driven<double, CUFINUFFT_DIM>(
-    const cufinufft_plan_t<double> &, const hipComplex<double> *,
-    hipComplex<double> *, int);
+    const cufinufft_plan_t<double> &, const cuda_complex<double> *,
+    cuda_complex<double> *, int);
 
 } // namespace spreadinterp
 } // namespace cufinufft
