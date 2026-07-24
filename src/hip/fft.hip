@@ -9,7 +9,7 @@
 #include <hip/hip_complex.h>
 #include <hip/hip_runtime.h>
 
-#include <cufinufft/contrib/helper_cuda.h>
+#include <cufinufft/contrib/helper_hip.h>
 #include <cufinufft/fft.hpp>
 #include <cufinufft/spreadinterp.hpp>
 #include <cufinufft/utils.hpp>

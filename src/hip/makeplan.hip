@@ -6,7 +6,7 @@
 #include <hip/hip_runtime.h>
 #include <iostream>
 
-#include <cufinufft/contrib/helper_cuda.h>
+#include <cufinufft/contrib/helper_hip.h>
 #include <cufinufft/contrib/helper_math.h>
 
 #include <cufinufft.h>
