@@ -7,7 +7,7 @@
 #include <cufinufft/hip/spreadinterp.hpp>
 #include <cufinufft/hip/utils.hpp>
 #include <poet/poet.hpp>
-#define CUFINUFFT_DIM 1
+
 #ifndef CUFINUFFT_DIM
 #error "CUFINUFFT_DIM must be defined to 1, 2, or 3 (set by CMake)"
 #endif

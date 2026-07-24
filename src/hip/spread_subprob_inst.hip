@@ -145,7 +145,7 @@ template<typename T, int Ndim> void do_indexSort_subprob_and_OD(cufinufft_plan_t
       p.M, p.nf123, inv_binsizes, nbins, dethrust(p.binsize), p.kxyz,
       dethrust(p.sortidx));
   THROW_IF_HIP_ERROR();
-  thrust::exclusive_scan(thrust::cuda::par.on(p.stream), p.binsize.begin(),
+  thrust::exclusive_scan(thrust::hip::par.on(p.stream), p.binsize.begin(),
                          p.binsize.end(), p.binstartpts.begin());
   THROW_IF_HIP_ERROR();
   calc_inverse_of_global_sort_idx<T, Ndim>
@@ -161,7 +161,7 @@ template<typename T, int Ndim> void do_indexSort_subprob_and_OD(cufinufft_plan_t
       dethrust(p.binsize), dethrust(p.numsubprob), p.opts.gpu_maxsubprobsize, nbins_tot);
   THROW_IF_HIP_ERROR();
 
-  thrust::inclusive_scan(thrust::cuda::par.on(p.stream), p.numsubprob.begin(),
+  thrust::inclusive_scan(thrust::hip::par.on(p.stream), p.numsubprob.begin(),
                          p.numsubprob.begin() + nbins_tot, p.subprobstartpts.begin() + 1);
   THROW_IF_HIP_ERROR();
 
@@ -169,7 +169,7 @@ template<typename T, int Ndim> void do_indexSort_subprob_and_OD(cufinufft_plan_t
   checkHipErrors(hipMemsetAsync(dethrust(p.subprobstartpts), 0, sizeof(int), p.stream));
   checkHipErrors(
       hipMemcpyAsync(&totalnumsubprob, &(dethrust(p.subprobstartpts)[nbins_tot]),
-                      sizeof(int), cudaMemcpyDeviceToHost, p.stream));
+                      sizeof(int), hipMemcpyDeviceToHost, p.stream));
   hipStreamSynchronize(p.stream);
   p.subprob_to_bin.resize(totalnumsubprob);
 
