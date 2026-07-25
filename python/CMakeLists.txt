@@ -10,7 +10,7 @@ if(FINUFFT_USE_CPU)
     endif()
 endif()
 
-if(FINUFFT_USE_CUDA)
+if(FINUFFT_USE_CUDA OR FINUFFT_USE_HIP)
     install(TARGETS cufinufft LIBRARY DESTINATION cufinufft RUNTIME DESTINATION cufinufft)
     if(ENV{EDITABLE_REBUILD} STREQUAL "true")
         install(
