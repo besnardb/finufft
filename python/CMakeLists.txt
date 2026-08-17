@@ -1,4 +1,5 @@
 if(FINUFFT_USE_CPU)
+    set_target_properties(finufft PROPERTIES INSTALL_RPATH "$ORIGIN" BUILD_WITH_INSTALL_RPATH TRUE)
     install(TARGETS finufft LIBRARY DESTINATION finufft RUNTIME DESTINATION finufft)
     if(ENV{EDITABLE_REBUILD} STREQUAL "true")
         install(
@@ -6,11 +7,17 @@ if(FINUFFT_USE_CPU)
             LIBRARY DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/finufft/finufft
             RUNTIME DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/finufft/finufft
         )
-        set_target_properties(finufft PROPERTIES INSTALL_RPATH "$ORIGIN" BUILD_WITH_INSTALL_RPATH TRUE)
     endif()
 endif()
 
 if(FINUFFT_USE_CUDA OR FINUFFT_USE_HIP)
+    set_target_properties(
+        cufinufft
+        PROPERTIES
+            INSTALL_RPATH "$ORIGIN"
+            INSTALL_RPATH_USE_LINK_PATH TRUE
+            BUILD_WITH_INSTALL_RPATH TRUE
+    )
     install(TARGETS cufinufft LIBRARY DESTINATION cufinufft RUNTIME DESTINATION cufinufft)
     if(ENV{EDITABLE_REBUILD} STREQUAL "true")
         install(
@@ -18,7 +25,6 @@ if(FINUFFT_USE_CUDA OR FINUFFT_USE_HIP)
             LIBRARY DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/cufinufft/cufinufft
             RUNTIME DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/cufinufft/cufinufft
         )
-        set_target_properties(cufinufft PROPERTIES INSTALL_RPATH "$ORIGIN" BUILD_WITH_INSTALL_RPATH TRUE)
     endif()
 endif()
 
