@@ -31,10 +31,12 @@ function(detect_hip_architecture)
 
     endif()
 
-    message(WARNING
-        "Could not detect AMD GPU architecture. "
-        "Set CMAKE_HIP_ARCHITECTURES manually."
+    message(STATUS
+        "Could not detect AMD GPU architecture (no GPU visible on this host). "
+        "Falling back to CMAKE_HIP_ARCHITECTURES=all. Set it explicitly "
+        "(e.g. -DCMAKE_HIP_ARCHITECTURES=gfx90a) to target a specific GPU."
     )
+    set(CMAKE_HIP_ARCHITECTURES "all" CACHE STRING "HIP architectures" FORCE)
 
 endfunction()
 
@@ -53,6 +55,13 @@ else()
 
 endif()
 
+if(DEFINED ENV{ROCM_PATH})
+    list(APPEND CMAKE_PREFIX_PATH "$ENV{ROCM_PATH}")
+elseif(CMAKE_CXX_COMPILER MATCHES "^(.*)/llvm/bin/clang\\+\\+$")
+    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_MATCH_1}")
+elseif(EXISTS "/opt/rocm")
+    list(APPEND CMAKE_PREFIX_PATH "/opt/rocm")
+endif()
 
 enable_language(HIP)
 
