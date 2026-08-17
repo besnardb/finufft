@@ -83,7 +83,9 @@ build-verbosity = 1
 # Python floor (>=3.10) comes from requires-python; here we only drop
 # PyPy and unsupported architectures.
 skip = "pp* *-manylinux_i686 *_ppc64le *_s390x *_universal2"
-config-settings = {"cmake.define.CMAKE_HIP_ARCHITECTURES" = "all", "cmake.define.CIBUILDWHEEL" = "ON"}
+# "all" isn't a valid --offload-arch for clang/HIP (unlike CUDA, CMake
+# doesn't expand it), so list the target archs explicitly.
+config-settings = {"cmake.define.CMAKE_HIP_ARCHITECTURES" = "gfx90a;gfx942", "cmake.define.CIBUILDWHEEL" = "ON"}
 
 [tool.cibuildwheel.linux]
 # Use manylinux_2_28 (AlmaLinux 8, glibc 2.28) rather than the EOL

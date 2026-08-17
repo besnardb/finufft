@@ -33,10 +33,11 @@ function(detect_hip_architecture)
 
     message(STATUS
         "Could not detect AMD GPU architecture (no GPU visible on this host). "
-        "Falling back to CMAKE_HIP_ARCHITECTURES=all. Set it explicitly "
-        "(e.g. -DCMAKE_HIP_ARCHITECTURES=gfx90a) to target a specific GPU."
+        "Falling back to CMAKE_HIP_ARCHITECTURES=gfx90a;gfx942. Set it "
+        "explicitly (e.g. -DCMAKE_HIP_ARCHITECTURES=gfx90a) to target a "
+        "specific GPU."
     )
-    set(CMAKE_HIP_ARCHITECTURES "all" CACHE STRING "HIP architectures" FORCE)
+    set(CMAKE_HIP_ARCHITECTURES "gfx90a;gfx942" CACHE STRING "HIP architectures" FORCE)
 
 endfunction()
 
