@@ -79,6 +79,13 @@ In addition to the C interface, cuFINUFFT also comes with a Python interface. As
 
     pip install python/cufinufft
 
+By default this builds the HIP/ROCm backend. To build for CUDA instead, set
+the ``FINUFFT_GPU_BACKEND`` environment variable:
+
+.. code-block:: bash
+
+    FINUFFT_GPU_BACKEND=cuda pip install python/cufinufft
+
 Note that since cuFINUFFT supports a number of different GPU frameworks (CuPy, Numba, PyTorch, and PyCuda), it does not install any of these automatically as a dependency.
 You must therefore install one of these manually.
 For example, for CuPy, you would run
